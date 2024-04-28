@@ -17,7 +17,7 @@ import { sendDiscordNotification } from "@/discord";
 
 puppeteer.use(StealthPlugin());
 
-const puppeteerTimeout = 150000;
+const puppeteerTimeout = 45000;
 const calenderIconSelector = "span.fa-calendar-minus";
 const dateOfAppointmentSelector = "#appointments_consulate_appointment_date";
 const timeOfAppointmentSelector = "#appointments_consulate_appointment_time";
