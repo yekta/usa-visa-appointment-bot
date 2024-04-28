@@ -69,13 +69,13 @@ export async function checkAppointmentDate() {
 
       if (foundEarlierDate) {
         console.log(
-          "✅🎉 Found an earlier appointment date.",
+          "🟢 Found an earlier appointment date.",
           earliestAppointmentDate,
           currentAppointmentDate
         );
       } else {
         console.log(
-          "✅😭 Couldn't find an earlier appointment date.",
+          "🔵 Couldn't find an earlier appointment date.",
           earliestAppointmentDate,
           currentAppointmentDate
         );
