@@ -1,6 +1,5 @@
 # Use an official Node.js runtime as a parent image
-FROM node:20-slim
-
+FROM ghcr.io/puppeteer/puppeteer:latest
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
