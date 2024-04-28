@@ -4,6 +4,7 @@ import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import * as moment from "moment-timezone";
 import { randomDelay } from "@/utils.ts";
 import {
+  isProduction,
   localeOptions,
   timeLocale,
   timeZone,
@@ -35,6 +36,9 @@ export async function checkAppointmentDate() {
     const browser = await puppeteer.launch({
       headless: true,
       timeout: puppeteerTimeout,
+      args: isProduction
+        ? ["--no-sandbox", "--disable-setuid-sandbox"]
+        : undefined,
     });
     const page = await browser.newPage();
     page.setDefaultTimeout(puppeteerTimeout);

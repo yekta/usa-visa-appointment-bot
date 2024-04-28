@@ -1,5 +1,6 @@
 # Use an official Node.js runtime as a parent image
-FROM ghcr.io/puppeteer/puppeteer:latest
+FROM node:20-slim
+
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
@@ -31,14 +32,6 @@ RUN apt-get update && apt-get install -y \
   libxss1 \
   --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -r nodeuser && useradd -r -g nodeuser -G audio,video nodeuser \
-  && mkdir -p /home/nodeuser/Downloads \
-  && chown -R nodeuser:nodeuser /home/nodeuser \
-  && chown -R nodeuser:nodeuser /usr/src/app
-
-# Run everything after as non-root user
-USER nodeuser
-
 # Install typescript
 RUN npm install typescript
 
@@ -50,6 +43,8 @@ COPY . .
 
 # Build the application
 RUN npm run build
+
+EXPOSE 3000
 
 # Define the command to run your app using CMD which defines your runtime
 CMD [ "node", "dist/main.js" ]

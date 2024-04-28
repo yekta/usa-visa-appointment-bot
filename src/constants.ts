@@ -21,3 +21,5 @@ export const discordUnsuccessfulWebhookUrl =
 export const usvisaEmail = process.env.USVISA_EMAIL || "";
 export const usvisaPassword = process.env.USVISA_PASSWORD || "";
 export const usvisaSignInUrl = process.env.USVISA_SIGN_IN_URL || "";
+
+export const isProduction = process.env.IS_PROD === "true";
