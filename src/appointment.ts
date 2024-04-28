@@ -113,13 +113,25 @@ async function signIn(page: Page) {
 
   const emailSelector = "#user_email";
   const passwordSelector = "#user_password";
-  const acceptPolicySelector = 'label[for="policy_confirmed"]';
+  const acceptPolicySelector = "#policy_confirmed";
   const signInButtonSelector = 'input[name="commit"]';
 
   console.log("Visiting the sign in page");
   await page.goto(usvisaSignInUrl);
+
+  console.log(
+    "Waiting for the email, password and accept policy inputs to load..."
+  );
+  const [] = await Promise.all([
+    page.waitForSelector(emailSelector),
+    page.waitForSelector(passwordSelector),
+    page.waitForSelector(acceptPolicySelector),
+  ]);
+
+  console.log("Typing the email and password");
   await page.type(emailSelector, usvisaEmail);
   await page.type(passwordSelector, usvisaPassword);
+
   console.log("Clicking the accept policy button");
   const [] = await Promise.all([page.click(acceptPolicySelector)]);
 
@@ -252,14 +264,7 @@ async function findAndSelectEarliestTime(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment time...");
 
   console.log("Waiting for the time select element to load...");
-  await page.waitForFunction(
-    (selector) => {
-      const select = document.querySelector(selector);
-      return select && select.children.length > 1;
-    },
-    {},
-    timeOfAppointmentSelector
-  );
+  await randomDelay(9000, 10000);
 
   console.log("Finding the earliest time string...");
   const earliestTime = await page.evaluate((selector) => {
