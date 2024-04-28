@@ -114,8 +114,8 @@ async function signIn(page: Page) {
   const acceptPolicySelector = 'label[for="policy_confirmed"]';
   const signInButtonSelector = 'input[name="commit"]';
 
-  console.log("Visiting the sign in page 1");
-  await page.goto("https://theverge.com");
+  console.log("Visiting the sign in page 2");
+  await page.goto("https://theverge.com", { waitUntil: "networkidle0" });
   console.log("Waiting for the email and password fields");
   await page.waitForSelector(emailSelector);
   await page.waitForSelector(passwordSelector);
