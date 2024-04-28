@@ -10,7 +10,7 @@ puppeteer.use(StealthPlugin());
 
 const usvisaEmail = process.env.USVISA_EMAIL || "";
 const usvisaPassword = process.env.USVISA_PASSWORD || "";
-const signInUrl = "https://ais.usvisa-info.com/en-tr/niv/users/sign_in";
+const usvisaSignInUrl = process.env.USVISA_SIGN_IN_URL || "";
 const timeZone = "Europe/Istanbul";
 const timeLocale = "en-GB";
 const puppeteerTimeout = 60000;
@@ -22,6 +22,7 @@ export async function checkAppointmentDate() {
       .then(async (browser) => {
         console.log("⏳ Process started...");
         const page = await browser.newPage();
+        page.setDefaultTimeout(puppeteerTimeout);
         await signIn(page);
         const currentAppointmentDate = await getCurrentAppointmentDate(page);
         await page.screenshot({ path: "result.png", fullPage: true });
@@ -40,7 +41,7 @@ async function signIn(page: Page) {
   const passwordSelector = "#user_password";
   const acceptPolicySelector = 'label[for="policy_confirmed"]';
   const signInButtonSelector = 'input[name="commit"]';
-  await page.goto(signInUrl);
+  await page.goto(usvisaSignInUrl);
   await page.waitForSelector(emailSelector);
   await page.waitForSelector(passwordSelector);
   await page.type(emailSelector, usvisaEmail);
