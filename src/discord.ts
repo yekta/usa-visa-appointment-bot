@@ -85,14 +85,15 @@ export async function sendDiscordNotification(
   };
 
   const formData = new FormData();
+  const content = hasError
+    ? `There is an error! <@${discordUserId}>`
+    : foundEarlierDate
+      ? `Found an earlier date! <@${discordUserId}>`
+      : "Nothing interesting.";
   formData.append(
     "payload_json",
     JSON.stringify({
-      content: hasError
-        ? `There is an error! <@${discordUserId}>`
-        : foundEarlierDate
-          ? `Found an earlier date! <@${discordUserId}>`
-          : "Nothing interesting.",
+      content: content,
       embeds: [embed],
     })
   );
