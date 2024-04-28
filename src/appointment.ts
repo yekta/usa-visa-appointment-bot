@@ -114,13 +114,16 @@ async function signIn(page: Page) {
   const acceptPolicySelector = 'label[for="policy_confirmed"]';
   const signInButtonSelector = 'input[name="commit"]';
 
+  console.log("Visiting the sign in page");
   await page.goto(usvisaSignInUrl);
+  console.log("Waiting for the email and password fields");
   await page.waitForSelector(emailSelector);
   await page.waitForSelector(passwordSelector);
   await page.type(emailSelector, usvisaEmail);
   await page.type(passwordSelector, usvisaPassword);
   await page.click(acceptPolicySelector);
   await page.click(signInButtonSelector);
+  console.log("Waiting for navigation");
   await page.waitForNavigation();
 
   console.log("✅ Signed in successfully.");

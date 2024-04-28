@@ -23,5 +23,3 @@ export const usvisaPassword = process.env.USVISA_PASSWORD || "";
 export const usvisaSignInUrl = process.env.USVISA_SIGN_IN_URL || "";
 
 export const isProduction = process.env.IS_PROD === "true";
-
-console.log(usvisaEmail, discordUnsuccessfulWebhookUrl);
