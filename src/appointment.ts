@@ -34,7 +34,7 @@ export async function checkAppointmentDate() {
   try {
     console.log("⏳ Process started...");
     let extraArgs = isProduction
-      ? { ignoreHTTPSErrors: true, dumpio: false }
+      ? { ignoreHTTPSErrors: true, dumpio: true }
       : {};
     const browser = await puppeteer.launch({
       headless: true,
