@@ -26,6 +26,8 @@ export async function sendDiscordNotification(
     processEndDate,
   } = options;
 
+  const hasError = !currentAppointmentDate || !earliestAppointmentDate;
+
   const foundEarlierDate =
     currentAppointmentDate &&
     earliestAppointmentDate &&
@@ -41,23 +43,25 @@ export async function sendDiscordNotification(
   );
 
   const embed = {
-    title: foundEarlierDate
-      ? "🎉 Found earlier appointment date"
-      : "😭 Couldn't find an earlier appointment date.",
+    title: hasError
+      ? "🔴 Something went wrong!"
+      : foundEarlierDate
+        ? "🟢 Found earlier appointment date"
+        : "🔵 Couldn't find an earlier appointment date.",
     color: 0x3498db,
     fields: [
       {
         name: "Earliest Appointment Date",
         value: earliestAppointmentDate
           ? earliestAppointmentDate.toLocaleString(timeLocale, localeOptions)
-          : "Unknown 🧐",
+          : "Unknown",
         inline: false,
       },
       {
         name: "Current Appointment Date",
         value: currentAppointmentDate
           ? currentAppointmentDate.toLocaleString(timeLocale, localeOptions)
-          : "Unknown 🧐",
+          : "Unknown",
         inline: false,
       },
       {
