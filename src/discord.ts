@@ -87,11 +87,16 @@ export async function sendDiscordNotification(
   );
   formData.append("file", screenshotBuffer, filename);
 
-  await fetch(webhookUrl, {
+  const res = await fetch(webhookUrl, {
     method: "POST",
     // @ts-ignore
     body: formData,
   });
 
-  console.log("✅ Discord notification sent successfully.");
+  if (!res.ok) {
+    throw new Error("❌ Failed to send Discord notification.");
+  }
+
+  const resJson = await res.json();
+  console.log("✅ Discord notification sent successfully.", resJson);
 }
