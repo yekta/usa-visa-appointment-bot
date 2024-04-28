@@ -94,6 +94,7 @@ export async function sendDiscordNotification(
   });
 
   if (!res.ok) {
+    console.log(res.status, res.statusText);
     throw new Error("❌ Failed to send Discord notification.");
   }
 
