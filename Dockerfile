@@ -32,6 +32,8 @@ RUN apt-get update && apt-get install -y \
   libxss1 \
   --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
+RUN npm install -g typescript
+
 # Install project dependencies
 RUN npm install
 
