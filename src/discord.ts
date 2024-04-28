@@ -1,6 +1,7 @@
 import {
   discordSuccessfulWebhookUrl,
   discordUnsuccessfulWebhookUrl,
+  discordUserId,
   localeOptions,
   timeLocale,
 } from "@/constants";
@@ -49,6 +50,10 @@ export async function sendDiscordNotification(
       : foundEarlierDate
         ? "🟢 Found earlier appointment date"
         : "🔵 Couldn't find an earlier appointment date.",
+    description:
+      hasError || foundEarlierDate
+        ? `<@${discordUserId}>, check this out!`
+        : undefined,
     color,
     fields: [
       {

@@ -17,6 +17,7 @@ export const discordSuccessfulWebhookUrl =
   process.env.DISCORD_SUCCESSFUL_WEBHOOK_URL || "";
 export const discordUnsuccessfulWebhookUrl =
   process.env.DISCORD_UNSUCCESSFUL_WEBHOOK_URL || "";
+export const discordUserId = process.env.DISCORD_USER_ID || "";
 
 export const usvisaEmail = process.env.USVISA_EMAIL || "";
 export const usvisaPassword = process.env.USVISA_PASSWORD || "";
