@@ -38,6 +38,14 @@ RUN npm install typescript
 # Install project dependencies
 RUN npm install
 
+RUN groupadd -r nodeuser && useradd -r -g nodeuser -G audio,video nodeuser \
+  && mkdir -p /home/nodeuser/Downloads \
+  && chown -R nodeuser:nodeuser /home/nodeuser \
+  && chown -R nodeuser:nodeuser /usr/src/app
+
+# Run everything after as non-root user
+USER nodeuser
+
 # Bundle app source
 COPY . .
 
