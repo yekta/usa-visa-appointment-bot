@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-extra";
-import type { Browser, Page } from "puppeteer";
+import type { Page } from "puppeteer";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import dotenv from "dotenv";
 import * as moment from "moment-timezone";
@@ -13,7 +13,7 @@ const usvisaPassword = process.env.USVISA_PASSWORD || "";
 const usvisaSignInUrl = process.env.USVISA_SIGN_IN_URL || "";
 const timeZone = "Europe/Istanbul";
 const timeLocale = "en-GB";
-const puppeteerTimeout = 60000;
+const puppeteerTimeout = 90000;
 
 export async function checkAppointmentDate() {
   try {
@@ -27,6 +27,7 @@ export async function checkAppointmentDate() {
 
     await signIn(page);
     const currentAppointmentDate = await getCurrentAppointmentDate(page);
+    await continueToDashboard(page);
 
     await page.screenshot({ path: "result.png", fullPage: true });
     await browser.close();
@@ -86,4 +87,17 @@ async function getCurrentAppointmentDate(page: Page) {
     date: dateJS,
     dateStr: dateStr,
   };
+}
+
+async function continueToDashboard(page: Page) {
+  console.log("⏳ Continuing to dashboard...");
+
+  const continueButtonSelector = "div.attend_appointment a.primary";
+  const calenderIconSelector = "span.fa-calendar-minus";
+
+  await page.click(continueButtonSelector);
+  await page.waitForSelector(calenderIconSelector);
+  await page.screenshot({ path: "result.png", fullPage: true });
+
+  console.log("✅ Continued to dashboard successfully.");
 }
