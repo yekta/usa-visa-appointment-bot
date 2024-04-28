@@ -50,10 +50,6 @@ export async function sendDiscordNotification(
       : foundEarlierDate
         ? "🟢 Found earlier appointment date"
         : "🔵 Couldn't find an earlier appointment date.",
-    description:
-      hasError || foundEarlierDate
-        ? `<@${discordUserId}>, check this out!`
-        : undefined,
     color,
     fields: [
       {
@@ -92,6 +88,10 @@ export async function sendDiscordNotification(
   formData.append(
     "payload_json",
     JSON.stringify({
+      content:
+        hasError || foundEarlierDate
+          ? `<@${discordUserId}>, check this out!`
+          : "Nothing interesting...",
       embeds: [embed],
     })
   );
