@@ -17,7 +17,7 @@ import { sendDiscordNotification } from "@/discord";
 
 puppeteer.use(StealthPlugin());
 
-const puppeteerTimeout = 30000;
+const puppeteerTimeout = 90000;
 const calenderIconSelector = "span.fa-calendar-minus";
 const dateOfAppointmentSelector = "#appointments_consulate_appointment_date";
 const timeOfAppointmentSelector = "#appointments_consulate_appointment_time";
@@ -117,18 +117,15 @@ async function signIn(page: Page) {
   const signInButtonSelector = 'input[name="commit"]';
 
   console.log("Visiting the sign in page");
-  await page.goto(usvisaSignInUrl, { waitUntil: "domcontentloaded" });
+  await page.goto(usvisaSignInUrl);
   await page.type(emailSelector, usvisaEmail);
   await page.type(passwordSelector, usvisaPassword);
   console.log("Clicking the accept policy button");
-  const [] = await Promise.all([
-    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
-    page.click(acceptPolicySelector),
-  ]);
+  const [] = await Promise.all([page.click(acceptPolicySelector)]);
 
   console.log("Clicking the sign in button and waiting for the  navigation");
   const [] = await Promise.all([
-    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.waitForNavigation(),
     page.click(signInButtonSelector),
   ]);
 
@@ -162,7 +159,7 @@ async function goToDashboard(page: Page) {
   const continueButtonSelector = "a.primary";
 
   const [] = await Promise.all([
-    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.waitForNavigation(),
     page.click(continueButtonSelector),
   ]);
 
@@ -196,10 +193,7 @@ async function goToReschedulePage(page: Page) {
 async function findEarliestAppointmentDate(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment date...");
 
-  const [] = await Promise.all([
-    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
-    page.click(dateOfAppointmentSelector),
-  ]);
+  const [] = await Promise.all([page.click(dateOfAppointmentSelector)]);
 
   await randomDelay(2000, 3000);
 
@@ -240,10 +234,7 @@ async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
       const rawDate = `${cellText} ${header}`;
       firstAvailableDateString = rawDate.replace(/\s/g, " ");
       console.log("First available date:", rawDate);
-      const [_] = await Promise.all([
-        page.waitForNavigation({ waitUntil: "domcontentloaded" }),
-        dateCell.click(),
-      ]);
+      const [] = await Promise.all([dateCell.click()]);
 
       await randomDelay(10000, 11000);
       break;
@@ -252,10 +243,7 @@ async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
   if (firstAvailableDateString) {
     return firstAvailableDateString;
   }
-  const [] = await Promise.all([
-    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
-    page.click(nextButtonSelector),
-  ]);
+  const [] = await Promise.all([page.click(nextButtonSelector)]);
 
   await randomDelay(500, 1000);
   return recursivelyFindAndClickEarliestDate(page, i + 1);
