@@ -119,10 +119,7 @@ async function signIn(page: Page) {
   const signInButtonSelector = 'input[name="commit"]';
 
   console.log("Visiting the sign in page");
-  await page.goto(usvisaSignInUrl);
-  console.log("Waiting for the email and password fields");
-  await page.waitForSelector(emailSelector);
-  await page.waitForSelector(passwordSelector);
+  await page.goto(usvisaSignInUrl, { waitUntil: "networkidle0" });
   await page.type(emailSelector, usvisaEmail);
   await page.type(passwordSelector, usvisaPassword);
   await page.click(acceptPolicySelector);
