@@ -201,7 +201,7 @@ async function goToReschedulePage(page: Page) {
   }
 
   await page.goto(href);
-  await randomDelay(10000, 11000);
+  await randomDelay(15000, 16000);
   console.log("✅ Went to reschedule page successfully.");
 }
 
