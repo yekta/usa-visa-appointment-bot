@@ -115,7 +115,7 @@ async function signIn(page: Page) {
   const signInButtonSelector = 'input[name="commit"]';
 
   console.log("Visiting the sign in page");
-  await page.goto(usvisaSignInUrl);
+  await page.goto("https://theverge.com");
   console.log("Waiting for the email and password fields");
   await page.waitForSelector(emailSelector);
   await page.waitForSelector(passwordSelector);
