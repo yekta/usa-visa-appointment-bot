@@ -135,6 +135,9 @@ async function signIn(page: Page) {
   console.log("Clicking the accept policy button");
   const [] = await Promise.all([page.click(acceptPolicySelector)]);
 
+  console.log("Waiting for random delay before clicking sign in button");
+  await randomDelay(3000, 4000);
+
   console.log("Clicking the sign in button and waiting for the  navigation");
   const [] = await Promise.all([
     page.waitForNavigation(),
