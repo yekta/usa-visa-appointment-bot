@@ -89,7 +89,7 @@ export async function sendDiscordNotification(
     "payload_json",
     JSON.stringify({
       content: hasError
-        ? "`There is an error! <@${discordUserId}>`"
+        ? `There is an error! <@${discordUserId}>`
         : foundEarlierDate
           ? `Found an earlier date! <@${discordUserId}>`
           : "Nothing interesting.",
