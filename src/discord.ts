@@ -99,6 +99,5 @@ export async function sendDiscordNotification(
     throw new Error("❌ Failed to send Discord notification.");
   }
 
-  const resJson = await res.json();
-  console.log("✅ Discord notification sent successfully.", resJson);
+  console.log("✅ Discord notification sent successfully.");
 }
