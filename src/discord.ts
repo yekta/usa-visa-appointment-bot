@@ -17,6 +17,8 @@ type SendMessageOptions = {
 export async function sendDiscordNotification(
   options: SendMessageOptions
 ): Promise<void> {
+  console.log("⏳ Sending Discord notification...");
+  console.log(discordSuccessfulWebhookUrl, discordUnsuccessfulWebhookUrl);
   const {
     screenshotBuffer,
     currentAppointmentDate,
@@ -88,6 +90,9 @@ export async function sendDiscordNotification(
 
   await fetch(webhookUrl, {
     method: "POST",
+    // @ts-ignore
     body: formData,
   });
+
+  console.log("✅ Discord notification sent successfully.");
 }

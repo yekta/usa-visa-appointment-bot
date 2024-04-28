@@ -17,7 +17,7 @@ import { sendDiscordNotification } from "@/discord";
 
 puppeteer.use(StealthPlugin());
 
-const puppeteerTimeout = 90000;
+const puppeteerTimeout = 150000;
 const calenderIconSelector = "span.fa-calendar-minus";
 const dateOfAppointmentSelector = "#appointments_consulate_appointment_date";
 const timeOfAppointmentSelector = "#appointments_consulate_appointment_time";
@@ -91,7 +91,6 @@ export async function checkAppointmentDate() {
 
     const endTime = new Date();
 
-    console.log("⏳ Sending Discord notification...");
     await sendDiscordNotification({
       screenshotBuffer,
       currentAppointmentDate,
@@ -99,7 +98,6 @@ export async function checkAppointmentDate() {
       processStartDate: startTime,
       processEndDate: endTime,
     });
-    console.log("✅ Discord notification sent successfully.");
 
     console.log(`✅ All done!`);
   } catch (error) {
