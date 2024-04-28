@@ -39,9 +39,7 @@ export async function checkAppointmentDate() {
     const browser = await puppeteer.launch({
       headless: true,
       timeout: puppeteerTimeout,
-      args: isProduction
-        ? ["--no-sandbox", "--disable-setuid-sandbox"]
-        : undefined,
+      args: isProduction ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
       ...extraArgs,
     });
     const page = await browser.newPage();
