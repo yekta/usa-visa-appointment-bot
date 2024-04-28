@@ -8,4 +8,4 @@ app.get("/health", (req, res) => {
 });
 
 checkAppointmentDate();
-cron.schedule("*/10 * * * *", checkAppointmentDate);
+cron.schedule("*/15 * * * *", checkAppointmentDate);
