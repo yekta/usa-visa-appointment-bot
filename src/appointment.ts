@@ -264,7 +264,7 @@ async function findAndSelectEarliestTime(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment time...");
 
   console.log("Waiting for the time select element to load...");
-  await randomDelay(15000, 16000);
+  await randomDelay(20000, 21000);
 
   console.log("Finding the earliest time string...");
   const earliestTime = await page.evaluate((selector) => {
