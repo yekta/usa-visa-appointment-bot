@@ -267,7 +267,7 @@ async function findAndSelectEarliestTime(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment time...");
 
   console.log("Waiting for the time select element to load...");
-  await randomDelay(20000, 21000);
+  await randomDelay(30000, 31000);
 
   console.log("Finding the earliest time string...");
   const earliestTime = await page.evaluate((selector) => {
@@ -279,7 +279,7 @@ async function findAndSelectEarliestTime(page: Page) {
       (option) => option.textContent !== ""
     );
     if (!earliestOption) {
-      throw new Error("Could not find the earliest option");
+      throw new Error("Couldn't find the earliest option");
     }
     return earliestOption.textContent;
   }, timeOfAppointmentSelector);
