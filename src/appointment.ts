@@ -33,10 +33,14 @@ export async function checkAppointmentDate() {
   let earliestAppointmentDate: Date | null = null;
   try {
     console.log("⏳ Process started...");
+    let extraArgs = isProduction
+      ? { ignoreHTTPSErrors: true, dumpio: false }
+      : {};
     const browser = await puppeteer.launch({
       headless: true,
       timeout: puppeteerTimeout,
       args: isProduction ? ["--no-sandbox"] : undefined,
+      ...extraArgs,
     });
     const page = await browser.newPage();
     page.setDefaultTimeout(puppeteerTimeout);

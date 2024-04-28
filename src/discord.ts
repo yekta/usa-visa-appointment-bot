@@ -1,10 +1,10 @@
-import FormData from "form-data";
 import {
   discordSuccessfulWebhookUrl,
   discordUnsuccessfulWebhookUrl,
   localeOptions,
   timeLocale,
 } from "@/constants";
+import { FormData } from "formdata-node";
 
 type SendMessageOptions = {
   screenshotBuffer: Buffer;
