@@ -17,7 +17,7 @@ import { sendDiscordNotification } from "@/discord";
 
 puppeteer.use(StealthPlugin());
 
-const puppeteerTimeout = 45000;
+const puppeteerTimeout = 30000;
 const calenderIconSelector = "span.fa-calendar-minus";
 const dateOfAppointmentSelector = "#appointments_consulate_appointment_date";
 const timeOfAppointmentSelector = "#appointments_consulate_appointment_time";
@@ -39,7 +39,9 @@ export async function checkAppointmentDate() {
     const browser = await puppeteer.launch({
       headless: true,
       timeout: puppeteerTimeout,
-      args: isProduction ? ["--no-sandbox"] : undefined,
+      args: isProduction
+        ? ["--no-sandbox", "--disable-setuid-sandbox"]
+        : undefined,
       ...extraArgs,
     });
     const page = await browser.newPage();
@@ -116,8 +118,8 @@ async function signIn(page: Page) {
   const acceptPolicySelector = 'label[for="policy_confirmed"]';
   const signInButtonSelector = 'input[name="commit"]';
 
-  console.log("Visiting the sign in page 2");
-  await page.goto("https://theverge.com", { waitUntil: "networkidle0" });
+  console.log("Visiting the sign in page 3");
+  await page.goto("https://theverge.com");
   console.log("Waiting for the email and password fields");
   await page.waitForSelector(emailSelector);
   await page.waitForSelector(passwordSelector);
