@@ -121,11 +121,16 @@ async function signIn(page: Page) {
   await page.type(emailSelector, usvisaEmail);
   await page.type(passwordSelector, usvisaPassword);
   console.log("Clicking the accept policy button");
-  await page.click(acceptPolicySelector);
-  console.log("Clicking the sign in button");
-  await page.click(signInButtonSelector);
-  console.log("Waiting for navigation");
-  await page.waitForNavigation({ waitUntil: "domcontentloaded" });
+  const [] = await Promise.all([
+    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.click(acceptPolicySelector),
+  ]);
+
+  console.log("Clicking the sign in button and waiting for the  navigation");
+  const [] = await Promise.all([
+    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.click(signInButtonSelector),
+  ]);
 
   console.log("✅ Signed in successfully.");
 }
@@ -156,7 +161,11 @@ async function goToDashboard(page: Page) {
 
   const continueButtonSelector = "a.primary";
 
-  await page.click(continueButtonSelector);
+  const [] = await Promise.all([
+    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.click(continueButtonSelector),
+  ]);
+
   await page.waitForSelector(calenderIconSelector);
 
   console.log("✅ Continued to dashboard successfully.");
@@ -187,7 +196,11 @@ async function goToReschedulePage(page: Page) {
 async function findEarliestAppointmentDate(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment date...");
 
-  await page.click(dateOfAppointmentSelector);
+  const [] = await Promise.all([
+    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.click(dateOfAppointmentSelector),
+  ]);
+
   await randomDelay(2000, 3000);
 
   let earliestDate = await recursivelyFindAndClickEarliestDate(page);
@@ -227,7 +240,11 @@ async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
       const rawDate = `${cellText} ${header}`;
       firstAvailableDateString = rawDate.replace(/\s/g, " ");
       console.log("First available date:", rawDate);
-      await dateCell.click();
+      const [_] = await Promise.all([
+        page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+        dateCell.click(),
+      ]);
+
       await randomDelay(10000, 11000);
       break;
     }
@@ -235,7 +252,11 @@ async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
   if (firstAvailableDateString) {
     return firstAvailableDateString;
   }
-  await page.click(nextButtonSelector);
+  const [] = await Promise.all([
+    page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+    page.click(nextButtonSelector),
+  ]);
+
   await randomDelay(500, 1000);
   return recursivelyFindAndClickEarliestDate(page, i + 1);
 }
