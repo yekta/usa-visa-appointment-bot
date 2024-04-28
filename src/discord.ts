@@ -85,7 +85,8 @@ export async function sendDiscordNotification(
       embeds: [embed],
     })
   );
-  formData.append("file", screenshotBuffer, filename);
+  const blob = new Blob([screenshotBuffer], { type: "image/png" });
+  formData.append("file", blob, filename);
 
   const res = await fetch(webhookUrl, {
     method: "POST",
