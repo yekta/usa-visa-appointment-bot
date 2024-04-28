@@ -125,7 +125,7 @@ async function signIn(page: Page) {
   console.log("Clicking the sign in button");
   await page.click(signInButtonSelector);
   console.log("Waiting for navigation");
-  await page.waitForNavigation();
+  await page.waitForNavigation({ waitUntil: "domcontentloaded" });
 
   console.log("✅ Signed in successfully.");
 }
