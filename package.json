@@ -1,0 +1,39 @@
+{
+  "name": "usa-visa",
+  "version": "1.0.0",
+  "description": "A tool for checking appointment dates for USA visa",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/main.ts",
+    "build": "rimraf dist && tsup src/main.ts",
+    "start": "node dist/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yekta/usa-visa-appointment-bot.git"
+  },
+  "keywords": [
+    "visa",
+    "usa",
+    "appointment"
+  ],
+  "author": "yekta",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yekta/usa-visa-appointment-bot/issues"
+  },
+  "homepage": "https://github.com/yekta/usa-visa-appointment-bot#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "moment-timezone": "^0.5.45",
+    "node-cron": "^3.0.3",
+    "puppeteer": "^22.7.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "@types/node-cron": "^3.0.11",
+    "tsup": "^8.0.2",
+    "tsx": "^4.7.3"
+  }
+}
