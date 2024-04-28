@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer-extra";
-import type { Page } from "puppeteer";
+import type { Browser, Page } from "puppeteer";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import dotenv from "dotenv";
 import * as moment from "moment-timezone";
@@ -17,18 +17,20 @@ const puppeteerTimeout = 60000;
 
 export async function checkAppointmentDate() {
   try {
-    await puppeteer
-      .launch({ headless: true, timeout: puppeteerTimeout })
-      .then(async (browser) => {
-        console.log("⏳ Process started...");
-        const page = await browser.newPage();
-        page.setDefaultTimeout(puppeteerTimeout);
-        await signIn(page);
-        const currentAppointmentDate = await getCurrentAppointmentDate(page);
-        await page.screenshot({ path: "result.png", fullPage: true });
-        await browser.close();
-        console.log(`✅ All done!`);
-      });
+    console.log("⏳ Process started...");
+    const browser = await puppeteer.launch({
+      headless: true,
+      timeout: puppeteerTimeout,
+    });
+    const page = await browser.newPage();
+    page.setDefaultTimeout(puppeteerTimeout);
+
+    await signIn(page);
+    const currentAppointmentDate = await getCurrentAppointmentDate(page);
+
+    await page.screenshot({ path: "result.png", fullPage: true });
+    await browser.close();
+    console.log(`✅ All done!`);
   } catch (error) {
     console.log(error);
   }
@@ -37,10 +39,12 @@ export async function checkAppointmentDate() {
 
 async function signIn(page: Page) {
   console.log("⏳ Signing in...");
+
   const emailSelector = "#user_email";
   const passwordSelector = "#user_password";
   const acceptPolicySelector = 'label[for="policy_confirmed"]';
   const signInButtonSelector = 'input[name="commit"]';
+
   await page.goto(usvisaSignInUrl);
   await page.waitForSelector(emailSelector);
   await page.waitForSelector(passwordSelector);
@@ -49,12 +53,15 @@ async function signIn(page: Page) {
   await page.click(acceptPolicySelector);
   await page.click(signInButtonSelector);
   await page.waitForNavigation();
+
   console.log("✅ Signed in successfully.");
 }
 
 async function getCurrentAppointmentDate(page: Page) {
   console.log("⏳ Getting current appointment date...");
+
   const paragraphSelector = "p.consular-appt";
+
   const rawAppointmentDate = await page.$eval(
     paragraphSelector,
     (el) => el.textContent
@@ -73,6 +80,7 @@ async function getCurrentAppointmentDate(page: Page) {
     hour: "numeric",
     minute: "numeric",
   });
+
   console.log("✅ Got the current appointment date:", dateStr);
   return {
     date: dateJS,
