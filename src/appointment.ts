@@ -40,6 +40,10 @@ export async function checkAppointmentDate() {
       headless: true,
       timeout: puppeteerTimeout,
       args: isProduction ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
+      defaultViewport: {
+        width: 1920,
+        height: 1080,
+      },
       ...extraArgs,
     });
     const page = await browser.newPage();
@@ -87,7 +91,6 @@ export async function checkAppointmentDate() {
 
     const screenshotBuffer = await page.screenshot({
       path: resultScreenshotPath,
-      fullPage: true,
     });
     await browser.close();
 
