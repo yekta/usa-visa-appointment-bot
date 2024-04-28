@@ -235,8 +235,7 @@ async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
       firstAvailableDateString = rawDate.replace(/\s/g, " ");
       console.log("First available date:", rawDate);
       const [] = await Promise.all([dateCell.click()]);
-
-      await randomDelay(10000, 11000);
+      await randomDelay(5000, 6000);
       break;
     }
   }
@@ -252,6 +251,7 @@ async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
 async function findAndSelectEarliestTime(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment time...");
 
+  console.log("Waiting for the time select element to load...");
   await page.waitForFunction(
     (selector) => {
       const select = document.querySelector(selector);
@@ -261,6 +261,7 @@ async function findAndSelectEarliestTime(page: Page) {
     timeOfAppointmentSelector
   );
 
+  console.log("Finding the earliest time string...");
   const earliestTime = await page.evaluate((selector) => {
     const select = document.querySelector(selector);
     if (!select) {
@@ -279,8 +280,10 @@ async function findAndSelectEarliestTime(page: Page) {
     throw new Error("Could not find the earliest appointment time.");
   }
 
+  console.log("Selecting the earliest time...");
   await page.select(timeOfAppointmentSelector, earliestTime);
 
+  console.log("Waiting for random delay");
   await randomDelay(1000, 1500);
 
   const earliestTimeFormatted = earliestTime.replace(/\s/g, " ");
