@@ -32,12 +32,6 @@ RUN apt-get update && apt-get install -y \
   libxss1 \
   --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-# Install typescript
-RUN npm install typescript
-
-# Install project dependencies
-RUN npm install
-
 RUN groupadd -r nodeuser && useradd -r -g nodeuser -G audio,video nodeuser \
   && mkdir -p /home/nodeuser/Downloads \
   && chown -R nodeuser:nodeuser /home/nodeuser \
@@ -45,6 +39,12 @@ RUN groupadd -r nodeuser && useradd -r -g nodeuser -G audio,video nodeuser \
 
 # Run everything after as non-root user
 USER nodeuser
+
+# Install typescript
+RUN npm install typescript
+
+# Install project dependencies
+RUN npm install
 
 # Bundle app source
 COPY . .
