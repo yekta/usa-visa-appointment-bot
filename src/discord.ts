@@ -29,9 +29,10 @@ export async function sendDiscordNotification(
   const hasError = !currentAppointmentDate || !earliestAppointmentDate;
 
   const foundEarlierDate =
-    currentAppointmentDate &&
-    earliestAppointmentDate &&
-    earliestAppointmentDate <= currentAppointmentDate;
+    !hasError && earliestAppointmentDate <= currentAppointmentDate;
+
+  const color = hasError ? 0xe74c3c : foundEarlierDate ? 0x2ecc71 : 0x3498db;
+
   const webhookUrl = foundEarlierDate
     ? discordSuccessfulWebhookUrl
     : discordUnsuccessfulWebhookUrl;
@@ -48,7 +49,7 @@ export async function sendDiscordNotification(
       : foundEarlierDate
         ? "🟢 Found earlier appointment date"
         : "🔵 Couldn't find an earlier appointment date.",
-    color: 0x3498db,
+    color,
     fields: [
       {
         name: "Earliest Appointment Date",
