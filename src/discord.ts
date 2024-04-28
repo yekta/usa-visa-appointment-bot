@@ -18,7 +18,6 @@ export async function sendDiscordNotification(
   options: SendMessageOptions
 ): Promise<void> {
   console.log("⏳ Sending Discord notification...");
-  console.log(discordSuccessfulWebhookUrl, discordUnsuccessfulWebhookUrl);
   const {
     screenshotBuffer,
     currentAppointmentDate,
