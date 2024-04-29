@@ -268,9 +268,16 @@ async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
 
 async function findAndSelectEarliestTime(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment time...");
+  const consularSectionSelector =
+    "#appointments_consulate_appointment_facility_id";
+
+  console.log("Waiting delay for consular section...");
+  await randomDelay(2000, 3000);
+  console.log("Clicking the consular section");
+  await page.click(consularSectionSelector);
 
   console.log("Waiting for the time select element to load...");
-  await randomDelay(30000, 31000);
+  await randomDelay(5000, 6000);
 
   console.log("Finding the earliest time string...");
   const earliestTime = await page.evaluate((selector) => {
