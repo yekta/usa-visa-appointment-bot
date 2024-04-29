@@ -138,7 +138,7 @@ async function signIn(page: Page) {
   console.log("Clicking the accept policy button");
   const [] = await Promise.all([page.click(acceptPolicySelector)]);
 
-  console.log("Waiting for random delay before clicking sign in button");
+  console.log("Waiting for delay before clicking sign in button");
   await randomDelay(3000, 4000);
 
   console.log("Clicking the sign in button and waiting for the  navigation");
@@ -227,15 +227,13 @@ async function getEarliestAppointmentDate(page: Page) {
 async function getAndSelectEarliestAppointmentDateOnly(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment date...");
 
-  console.log("Waiting for random delay before clicking the date input...");
+  console.log("Waiting for delay before clicking the date input...");
   await randomDelay(2000, 3000);
 
   console.log("Clicking the date of appointment input");
   const [] = await Promise.all([page.click(dateOfAppointmentSelector)]);
 
-  console.log(
-    "Waiting for random delay before running the recursive function..."
-  );
+  console.log("Waiting for delay before running the recursive function...");
   await randomDelay(2000, 3000);
 
   let earliestDate = await recursivelyFindAndClickEarliestDateOnly(page);
@@ -325,7 +323,7 @@ async function getAndSelectEarliestAppointmentTimeOnly(page: Page) {
   console.log("Selecting the earliest time...");
   await page.select(timeOfAppointmentSelector, earliestTime);
 
-  console.log("Waiting for random delay");
+  console.log("Waiting for delay");
   await randomDelay(1000, 1500);
 
   const earliestTimeFormatted = earliestTime.replace(/\s/g, " ");
