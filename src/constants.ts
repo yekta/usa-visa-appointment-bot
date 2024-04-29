@@ -24,7 +24,5 @@ export const usvisaPassword = process.env.USVISA_PASSWORD || "";
 export const usvisaSignInUrl = process.env.USVISA_SIGN_IN_URL || "";
 export const usvisaGetAppointmentUrl =
   process.env.USVISA_GET_APPOINTMENT_URL || "";
-export const usvisaCurrentAppointmentUrl =
-  process.env.USVISA_CURRENT_APPOINTMENT_URL || "";
 
 export const isProduction = process.env.IS_PROD === "true";
