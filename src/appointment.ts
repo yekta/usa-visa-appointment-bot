@@ -9,6 +9,7 @@ import {
   timeLocale,
   timeZone,
   usvisaEmail,
+  usvisaGetAppointmentUrl,
   usvisaPassword,
   usvisaSignInUrl,
 } from "@/constants";
@@ -19,7 +20,6 @@ import { backOff, type IBackOffOptions } from "exponential-backoff";
 puppeteer.use(StealthPlugin());
 
 const puppeteerTimeout = 60000;
-const calenderIconSelector = "span.fa-calendar-minus";
 const dateOfAppointmentSelector = "#appointments_consulate_appointment_date";
 const timeOfAppointmentSelector = "#appointments_consulate_appointment_time";
 const screenshotsDir = "screenshots";
@@ -31,6 +31,10 @@ const backOffOptions: Partial<IBackOffOptions> = {
   startingDelay: 5000,
   timeMultiple: 2,
   numOfAttempts: 3,
+  retry: (e, attemptNumber) => {
+    console.log(`Attempt number ${attemptNumber} failed. Retrying...`);
+    return true;
+  },
 };
 
 export async function checkAppointmentDate() {
@@ -103,8 +107,7 @@ async function mainProcess(page: Page) {
   await signIn(page);
   currentAppointmentDate = await getCurrentAppointmentDate(page);
 
-  await goToDashboard(page);
-  await goToReschedulePage(page);
+  await goToGetAppointmentPage(page);
 
   earliestAppointmentDate = await getEarliestAppointmentDate(page);
   const foundEarlierDate = earliestAppointmentDate <= currentAppointmentDate;
@@ -198,41 +201,10 @@ async function getCurrentAppointmentDate(page: Page) {
   return dateJS;
 }
 
-async function goToDashboard(page: Page) {
-  console.log("⏳ Continuing to dashboard...");
-
-  const continueButtonSelector = "a.primary";
-
-  const [] = await Promise.all([
-    page.waitForNavigation(),
-    page.click(continueButtonSelector),
-  ]);
-
-  await page.waitForSelector(calenderIconSelector);
-
-  console.log("✅ Continued to dashboard successfully.");
-}
-
-async function goToReschedulePage(page: Page) {
-  console.log("⏳ Going to reschedule page...");
-
-  const href = await page.evaluate(() => {
-    const anchors = Array.from(document.querySelectorAll("a"));
-    const rescheduleAnchor = anchors.find(
-      (anchor) =>
-        anchor.textContent?.includes("Reschedule") &&
-        anchor.href.includes("appointment")
-    );
-    return rescheduleAnchor?.href;
-  });
-
-  if (!href) {
-    throw new Error("Reschedule href not found.");
-  }
-
-  await page.goto(href);
-  await randomDelay(15000, 16000);
-  console.log("✅ Went to reschedule page successfully.");
+async function goToGetAppointmentPage(page: Page) {
+  console.log("⏳ Visiting the get appointment page...");
+  await page.goto(usvisaGetAppointmentUrl);
+  console.log("✅ Arrived at get appointment page successfully.");
 }
 
 async function getEarliestAppointmentDate(page: Page) {
