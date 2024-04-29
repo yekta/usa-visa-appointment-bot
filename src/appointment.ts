@@ -275,6 +275,7 @@ async function findAndSelectEarliestTime(page: Page) {
   await randomDelay(2000, 3000);
   console.log("Clicking the consular section");
   await page.click(consularSectionSelector);
+  await page.click(consularSectionSelector);
 
   console.log("Waiting for the time select element to load...");
   await randomDelay(5000, 6000);
