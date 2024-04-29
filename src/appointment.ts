@@ -9,7 +9,7 @@ import {
   timeLocale,
   timeZone,
   usvisaEmail,
-  usvisaGetAppointmentUrl,
+  usvisaRescheduleAppointmentUrl,
   usvisaPassword,
   usvisaSignInUrl,
 } from "@/constants";
@@ -107,7 +107,7 @@ async function mainProcess(page: Page) {
   await signIn(page);
   currentAppointmentDate = await getCurrentAppointmentDate(page);
 
-  await goToGetAppointmentPage(page);
+  await goToRescheduleAppointment(page);
 
   earliestAppointmentDate = await getEarliestAppointmentDate(page);
   const foundEarlierDate = earliestAppointmentDate <= currentAppointmentDate;
@@ -201,9 +201,9 @@ async function getCurrentAppointmentDate(page: Page) {
   return dateJS;
 }
 
-async function goToGetAppointmentPage(page: Page) {
+async function goToRescheduleAppointment(page: Page) {
   console.log("⏳ Visiting the get appointment page...");
-  await page.goto(usvisaGetAppointmentUrl);
+  await page.goto(usvisaRescheduleAppointmentUrl);
   console.log("✅ Arrived at get appointment page successfully.");
 }
 
