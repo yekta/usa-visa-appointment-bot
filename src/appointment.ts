@@ -57,7 +57,7 @@ export async function checkAppointmentDate() {
       await goToDashboard(page);
       await goToReschedulePage(page);
 
-      earliestAppointmentDate = await findEarliestAppointmentDateTime(page);
+      earliestAppointmentDate = await getEarliestAppointmentDate(page);
       const foundEarlierDate =
         earliestAppointmentDate <= currentAppointmentDate;
 
@@ -198,9 +198,11 @@ async function goToReschedulePage(page: Page) {
   console.log("✅ Went to reschedule page successfully.");
 }
 
-async function findEarliestAppointmentDateTime(page: Page) {
-  const earliestAppointmentDateString = await findEarliestAppointmentDate(page);
-  const earliestAppointmentTimeString = await findAndSelectEarliestTime(page);
+async function getEarliestAppointmentDate(page: Page) {
+  const earliestAppointmentDateString =
+    await getAndSelectEarliestAppointmentDateOnly(page);
+  const earliestAppointmentTimeString =
+    await getAndSelectEarliestAppointmentTimeOnly(page);
   const earliestAppointmentDateTime = `${earliestAppointmentDateString} ${earliestAppointmentTimeString}`;
   const earliestDateMoment = moment.tz(
     earliestAppointmentDateTime,
@@ -210,14 +212,14 @@ async function findEarliestAppointmentDateTime(page: Page) {
   return earliestDateMoment.toDate();
 }
 
-async function findEarliestAppointmentDate(page: Page) {
+async function getAndSelectEarliestAppointmentDateOnly(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment date...");
 
   const [] = await Promise.all([page.click(dateOfAppointmentSelector)]);
 
   await randomDelay(2000, 3000);
 
-  let earliestDate = await recursivelyFindAndClickEarliestDate(page);
+  let earliestDate = await recursivelyFindAndClickEarliestDateOnly(page);
   console.log(
     "✅ Found and selected the earliest appointment date:",
     earliestDate
@@ -226,7 +228,7 @@ async function findEarliestAppointmentDate(page: Page) {
   return earliestDate;
 }
 
-async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
+async function recursivelyFindAndClickEarliestDateOnly(page: Page, i = 0) {
   const nextButtonSelector = "a.ui-datepicker-next";
   const cellSelector = "tbody td";
   let firstAvailableDateString: string | null = null;
@@ -265,10 +267,10 @@ async function recursivelyFindAndClickEarliestDate(page: Page, i = 0) {
   const [] = await Promise.all([page.click(nextButtonSelector)]);
 
   await randomDelay(500, 1000);
-  return recursivelyFindAndClickEarliestDate(page, i + 1);
+  return recursivelyFindAndClickEarliestDateOnly(page, i + 1);
 }
 
-async function findAndSelectEarliestTime(page: Page) {
+async function getAndSelectEarliestAppointmentTimeOnly(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment time...");
   const consularSectionSelector =
     "#appointments_consulate_appointment_facility_id";
