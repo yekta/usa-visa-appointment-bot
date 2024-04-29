@@ -65,28 +65,14 @@ async function checkAppointmentDate() {
 
   // Main process
   try {
-    await backOff(() => signIn(page), backOffOptions);
-    currentAppointmentDate = await getCurrentAppointmentDate(page);
-
-    await goToDashboard(page);
-    await goToReschedulePage(page);
-
-    earliestAppointmentDate = await getEarliestAppointmentDate(page);
-    const foundEarlierDate = earliestAppointmentDate <= currentAppointmentDate;
-
-    if (foundEarlierDate) {
-      console.log(
-        "🟢 Found an earlier appointment date.",
-        earliestAppointmentDate,
-        currentAppointmentDate
-      );
-    } else {
-      console.log(
-        "🔵 No earlier appointment date.",
-        earliestAppointmentDate,
-        currentAppointmentDate
-      );
-    }
+    await backOff(async () => {
+      const {
+        currentAppointmentDate: current,
+        earliestAppointmentDate: earliest,
+      } = await mainProcess(page);
+      currentAppointmentDate = current;
+      earliestAppointmentDate = earliest;
+    }, backOffOptions);
   } catch (error) {
     console.log("❌ An error occurred:", error);
   }
@@ -109,6 +95,36 @@ async function checkAppointmentDate() {
 
   console.log(`✅ All done!`);
   return;
+}
+
+async function mainProcess(page: Page) {
+  let currentAppointmentDate: Date | null = null;
+  let earliestAppointmentDate: Date | null = null;
+
+  await signIn(page);
+  currentAppointmentDate = await getCurrentAppointmentDate(page);
+
+  await goToDashboard(page);
+  await goToReschedulePage(page);
+
+  earliestAppointmentDate = await getEarliestAppointmentDate(page);
+  const foundEarlierDate = earliestAppointmentDate <= currentAppointmentDate;
+
+  if (foundEarlierDate) {
+    console.log(
+      "🟢 Found an earlier appointment date.",
+      earliestAppointmentDate,
+      currentAppointmentDate
+    );
+  } else {
+    console.log(
+      "🔵 No earlier appointment date.",
+      earliestAppointmentDate,
+      currentAppointmentDate
+    );
+  }
+
+  return { currentAppointmentDate, earliestAppointmentDate };
 }
 
 async function signIn(page: Page) {
@@ -209,13 +225,8 @@ async function goToReschedulePage(page: Page) {
 }
 
 async function getEarliestAppointmentDate(page: Page) {
-  const earliestAppointmentDateString = backOff(
-    () => getAndSelectEarliestAppointmentDateOnly(page),
-    {
-      ...backOffOptions,
-      retry: () => reloadForBackOff(page),
-    }
-  );
+  const earliestAppointmentDateString =
+    await getAndSelectEarliestAppointmentDateOnly(page);
   const earliestAppointmentTimeString =
     await getAndSelectEarliestAppointmentTimeOnly(page);
   const earliestAppointmentDateTime = `${earliestAppointmentDateString} ${earliestAppointmentTimeString}`;
@@ -336,9 +347,4 @@ async function getAndSelectEarliestAppointmentTimeOnly(page: Page) {
   );
 
   return earliestTimeFormatted;
-}
-
-async function reloadForBackOff(page: Page) {
-  await page.reload();
-  return true;
 }
