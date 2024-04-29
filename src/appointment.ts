@@ -224,8 +224,8 @@ async function getEarliestAppointmentDate(page: Page) {
 async function getAndSelectEarliestAppointmentDateOnly(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment date...");
 
-  console.log("Waiting for delay before clicking the date input...");
-  await randomDelay(2000, 3000);
+  console.log("Waiting for date of appointment selector...");
+  await page.waitForSelector(dateOfAppointmentSelector);
 
   console.log("Clicking the date of appointment input");
   const [] = await Promise.all([page.click(dateOfAppointmentSelector)]);
