@@ -14,10 +14,11 @@ import {
 } from "@/constants";
 import fs from "fs";
 import { sendDiscordNotification } from "@/discord";
+import { backOff, type IBackOffOptions } from "exponential-backoff";
 
 puppeteer.use(StealthPlugin());
 
-const puppeteerTimeout = 90000;
+const puppeteerTimeout = 60000;
 const calenderIconSelector = "span.fa-calendar-minus";
 const dateOfAppointmentSelector = "#appointments_consulate_appointment_date";
 const timeOfAppointmentSelector = "#appointments_consulate_appointment_time";
@@ -26,78 +27,87 @@ if (!fs.existsSync(screenshotsDir)) {
   fs.mkdirSync(screenshotsDir);
 }
 const resultScreenshotPath = `${screenshotsDir}/result.png`;
+const backOffOptions: Partial<IBackOffOptions> = {
+  startingDelay: 2000,
+  numOfAttempts: 3,
+};
 
-export async function checkAppointmentDate() {
+export async function checkAppointmentDateWithBackoff() {
+  try {
+    await backOff(() => checkAppointmentDate(), backOffOptions);
+  } catch (error) {
+    console.log("❌ An error occurred with checkAppointmentDate:", error);
+  }
+}
+
+async function checkAppointmentDate() {
   const startTime = new Date();
+  console.log("⏳ Process started...");
+
   let currentAppointmentDate: Date | null = null;
   let earliestAppointmentDate: Date | null = null;
+
+  let extraArgs = isProduction
+    ? { ignoreHTTPSErrors: true, dumpio: false }
+    : {};
+  const browser = await puppeteer.launch({
+    headless: true,
+    timeout: puppeteerTimeout,
+    args: isProduction ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
+    defaultViewport: {
+      width: 1920,
+      height: 1080,
+    },
+    ...extraArgs,
+  });
+  const page = await browser.newPage();
+  page.setDefaultTimeout(puppeteerTimeout);
+
+  // Main process
   try {
-    console.log("⏳ Process started...");
-    let extraArgs = isProduction
-      ? { ignoreHTTPSErrors: true, dumpio: false }
-      : {};
-    const browser = await puppeteer.launch({
-      headless: true,
-      timeout: puppeteerTimeout,
-      args: isProduction ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
-      defaultViewport: {
-        width: 1920,
-        height: 1080,
-      },
-      ...extraArgs,
-    });
-    const page = await browser.newPage();
-    page.setDefaultTimeout(puppeteerTimeout);
+    await backOff(() => signIn(page), backOffOptions);
+    currentAppointmentDate = await getCurrentAppointmentDate(page);
 
-    // Main process
-    try {
-      await signIn(page);
-      currentAppointmentDate = await getCurrentAppointmentDate(page);
+    await goToDashboard(page);
+    await goToReschedulePage(page);
 
-      await goToDashboard(page);
-      await goToReschedulePage(page);
+    earliestAppointmentDate = await getEarliestAppointmentDate(page);
+    const foundEarlierDate = earliestAppointmentDate <= currentAppointmentDate;
 
-      earliestAppointmentDate = await getEarliestAppointmentDate(page);
-      const foundEarlierDate =
-        earliestAppointmentDate <= currentAppointmentDate;
-
-      if (foundEarlierDate) {
-        console.log(
-          "🟢 Found an earlier appointment date.",
-          earliestAppointmentDate,
-          currentAppointmentDate
-        );
-      } else {
-        console.log(
-          "🔵 No earlier appointment date.",
-          earliestAppointmentDate,
-          currentAppointmentDate
-        );
-      }
-    } catch (error) {
-      console.log("❌ An error occurred:", error);
+    if (foundEarlierDate) {
+      console.log(
+        "🟢 Found an earlier appointment date.",
+        earliestAppointmentDate,
+        currentAppointmentDate
+      );
+    } else {
+      console.log(
+        "🔵 No earlier appointment date.",
+        earliestAppointmentDate,
+        currentAppointmentDate
+      );
     }
-    // Main process end
-
-    const screenshotBuffer = await page.screenshot({
-      path: resultScreenshotPath,
-    });
-    await browser.close();
-
-    const endTime = new Date();
-
-    await sendDiscordNotification({
-      screenshotBuffer,
-      currentAppointmentDate,
-      earliestAppointmentDate,
-      processStartDate: startTime,
-      processEndDate: endTime,
-    });
-
-    console.log(`✅ All done!`);
   } catch (error) {
-    console.log(error);
+    console.log("❌ An error occurred:", error);
   }
+  // Main process end
+
+  const screenshotBuffer = await page.screenshot({
+    path: resultScreenshotPath,
+  });
+  await browser.close();
+
+  const endTime = new Date();
+
+  await sendDiscordNotification({
+    screenshotBuffer,
+    currentAppointmentDate,
+    earliestAppointmentDate,
+    processStartDate: startTime,
+    processEndDate: endTime,
+  });
+
+  console.log(`✅ All done!`);
   return;
 }
 

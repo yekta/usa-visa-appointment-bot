@@ -76,12 +76,7 @@ export async function sendDiscordNotification(
         inline: false,
       },
       {
-        name: "Process End",
-        value: processEndDate.toLocaleString(timeLocale, localeOptions),
-        inline: false,
-      },
-      {
-        name: "Process Duration (Seconds)",
+        name: "Process Duration (s)",
         value: processDurationInSeconds,
         inline: false,
       },
