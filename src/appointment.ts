@@ -209,8 +209,10 @@ async function goToReschedulePage(page: Page) {
 }
 
 async function getEarliestAppointmentDate(page: Page) {
-  const earliestAppointmentDateString =
-    await getAndSelectEarliestAppointmentDateOnly(page);
+  const earliestAppointmentDateString = await backOff(
+    () => getAndSelectEarliestAppointmentDateOnly(page),
+    backOffOptions
+  );
   const earliestAppointmentTimeString =
     await getAndSelectEarliestAppointmentTimeOnly(page);
   const earliestAppointmentDateTime = `${earliestAppointmentDateString} ${earliestAppointmentTimeString}`;
@@ -225,8 +227,15 @@ async function getEarliestAppointmentDate(page: Page) {
 async function getAndSelectEarliestAppointmentDateOnly(page: Page) {
   console.log("⏳ Finding and selecting the earliest appointment date...");
 
+  console.log("Waiting for random delay before clicking the date input...");
+  await randomDelay(2000, 3000);
+
+  console.log("Clicking the date of appointment input");
   const [] = await Promise.all([page.click(dateOfAppointmentSelector)]);
 
+  console.log(
+    "Waiting for random delay before running the recursive function..."
+  );
   await randomDelay(2000, 3000);
 
   let earliestDate = await recursivelyFindAndClickEarliestDateOnly(page);
