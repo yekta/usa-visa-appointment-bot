@@ -31,8 +31,8 @@ const backOffOptions: Partial<IBackOffOptions> = {
   startingDelay: 5000,
   timeMultiple: 2,
   numOfAttempts: 3,
-  retry: (e, attemptNumber) => {
-    console.log(`Attempt number ${attemptNumber} failed. Retrying...`);
+  retry: async (e, attemptNumber) => {
+    console.log(`🔴 Attempt number ${attemptNumber} failed. Retrying...`);
     return true;
   },
 };
