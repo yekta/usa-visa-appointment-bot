@@ -32,15 +32,15 @@ const backOffOptions: Partial<IBackOffOptions> = {
   numOfAttempts: 3,
 };
 
-export async function checkAppointmentDateWithBackoff() {
+export async function checkAppointmentDate() {
   try {
-    await backOff(() => checkAppointmentDate(), backOffOptions);
+    await _checkAppointmentDate();
   } catch (error) {
-    console.log("❌ An error occurred with checkAppointmentDate:", error);
+    console.error("❌ An error occurred with checkAppointmentDate:", error);
   }
 }
 
-async function checkAppointmentDate() {
+async function _checkAppointmentDate() {
   const startTime = new Date();
   console.log("⏳ Process started...");
 
@@ -65,14 +65,12 @@ async function checkAppointmentDate() {
 
   // Main process
   try {
-    await backOff(async () => {
-      const {
-        currentAppointmentDate: current,
-        earliestAppointmentDate: earliest,
-      } = await mainProcess(page);
-      currentAppointmentDate = current;
-      earliestAppointmentDate = earliest;
-    }, backOffOptions);
+    const {
+      currentAppointmentDate: current,
+      earliestAppointmentDate: earliest,
+    } = await backOff(() => mainProcess(page), backOffOptions);
+    currentAppointmentDate = current;
+    earliestAppointmentDate = earliest;
   } catch (error) {
     console.log("❌ An error occurred:", error);
   }
