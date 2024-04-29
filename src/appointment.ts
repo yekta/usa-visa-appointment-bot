@@ -28,19 +28,20 @@ if (!fs.existsSync(screenshotsDir)) {
 }
 const resultScreenshotPath = `${screenshotsDir}/result.png`;
 const backOffOptions: Partial<IBackOffOptions> = {
-  startingDelay: 2000,
+  startingDelay: 5000,
+  timeMultiple: 2,
   numOfAttempts: 3,
 };
 
 export async function checkAppointmentDate() {
   try {
-    await _checkAppointmentDate();
+    await checkAppointmentDateUnsafe();
   } catch (error) {
     console.error("❌ An error occurred with checkAppointmentDate:", error);
   }
 }
 
-async function _checkAppointmentDate() {
+async function checkAppointmentDateUnsafe() {
   const startTime = new Date();
   console.log("⏳ Process started...");
 
