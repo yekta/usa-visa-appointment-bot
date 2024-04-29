@@ -53,7 +53,7 @@ export async function sendDiscordNotification(
       ? "🔴 Something went wrong!"
       : foundEarlierAppointment
         ? "🟢 Found earlier appointment!"
-        : "🔵 Couldn't find an earlier appointment.",
+        : "🔵 No earlier appointment.",
     color,
     fields: [
       {
