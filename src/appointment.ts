@@ -134,8 +134,20 @@ async function signIn(page: Page) {
   const acceptPolicySelector = "#policy_confirmed";
   const signInButtonSelector = 'input[name="commit"]';
 
+  const modalSelector = "div.infoPopUp";
+  const modalCloseButtonSelector = 'button[title="Close"]';
+
   console.log("Visiting the sign in page");
   await page.goto(usvisaSignInUrl);
+
+  // check if there is a modal
+  const modal = await page.$(modalSelector);
+  if (modal) {
+    console.log("Closing the modal");
+    await page.click(modalCloseButtonSelector);
+    console.log("Waiting for the modal to close with a delay...");
+    await randomDelay(4000, 5000);
+  }
 
   console.log(
     "Waiting for the email, password and accept policy inputs to load..."
