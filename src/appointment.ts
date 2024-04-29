@@ -57,17 +57,7 @@ export async function checkAppointmentDate() {
       await goToDashboard(page);
       await goToReschedulePage(page);
 
-      const earliestAppointmentDateString =
-        await findEarliestAppointmentDate(page);
-      const earliestAppointmentTimeString =
-        await findAndSelectEarliestTime(page);
-      const earliestAppointmentDateTime = `${earliestAppointmentDateString} ${earliestAppointmentTimeString}`;
-      const earliestDateMoment = moment.tz(
-        earliestAppointmentDateTime,
-        "D MMMM YYYY HH:mm",
-        timeZone
-      );
-      earliestAppointmentDate = earliestDateMoment.toDate();
+      earliestAppointmentDate = await findEarliestAppointmentDateTime(page);
       const foundEarlierDate =
         earliestAppointmentDate <= currentAppointmentDate;
 
@@ -206,6 +196,18 @@ async function goToReschedulePage(page: Page) {
   await page.goto(href);
   await randomDelay(15000, 16000);
   console.log("✅ Went to reschedule page successfully.");
+}
+
+async function findEarliestAppointmentDateTime(page: Page) {
+  const earliestAppointmentDateString = await findEarliestAppointmentDate(page);
+  const earliestAppointmentTimeString = await findAndSelectEarliestTime(page);
+  const earliestAppointmentDateTime = `${earliestAppointmentDateString} ${earliestAppointmentTimeString}`;
+  const earliestDateMoment = moment.tz(
+    earliestAppointmentDateTime,
+    "D MMMM YYYY HH:mm",
+    timeZone
+  );
+  return earliestDateMoment.toDate();
 }
 
 async function findEarliestAppointmentDate(page: Page) {
