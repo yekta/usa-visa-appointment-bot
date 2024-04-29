@@ -8,4 +8,6 @@ app.get("/health", (req, res) => {
 });
 
 checkAppointmentDate();
-cron.schedule("*/15 * * * *", checkAppointmentDate);
+cron.schedule("*/15 * * * *", () => {
+  console.log("Running a task every 15 minutes");
+});
