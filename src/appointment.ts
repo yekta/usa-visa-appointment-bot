@@ -209,9 +209,12 @@ async function goToReschedulePage(page: Page) {
 }
 
 async function getEarliestAppointmentDate(page: Page) {
-  const earliestAppointmentDateString = await backOff(
+  const earliestAppointmentDateString = backOff(
     () => getAndSelectEarliestAppointmentDateOnly(page),
-    backOffOptions
+    {
+      ...backOffOptions,
+      retry: () => reloadForBackOff(page),
+    }
   );
   const earliestAppointmentTimeString =
     await getAndSelectEarliestAppointmentTimeOnly(page);
@@ -333,4 +336,9 @@ async function getAndSelectEarliestAppointmentTimeOnly(page: Page) {
   );
 
   return earliestTimeFormatted;
+}
+
+async function reloadForBackOff(page: Page) {
+  await page.reload();
+  return true;
 }
