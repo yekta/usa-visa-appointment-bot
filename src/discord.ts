@@ -29,12 +29,16 @@ export async function sendDiscordNotification(
 
   const hasError = !currentAppointmentDate || !earliestAppointmentDate;
 
-  const foundEarlierDate =
+  const foundEarlierAppointment =
     !hasError && earliestAppointmentDate <= currentAppointmentDate;
 
-  const color = hasError ? 0xe74c3c : foundEarlierDate ? 0x2ecc71 : 0x3498db;
+  const color = hasError
+    ? 0xe74c3c
+    : foundEarlierAppointment
+      ? 0x2ecc71
+      : 0x3498db;
 
-  const webhookUrl = foundEarlierDate
+  const webhookUrl = foundEarlierAppointment
     ? discordSuccessfulWebhookUrl
     : discordUnsuccessfulWebhookUrl;
 
@@ -47,32 +51,32 @@ export async function sendDiscordNotification(
   const embed = {
     title: hasError
       ? "🔴 Something went wrong!"
-      : foundEarlierDate
-        ? "🟢 Found earlier appointment date"
-        : "🔵 Couldn't find an earlier appointment date.",
+      : foundEarlierAppointment
+        ? "🟢 Found earlier appointment!"
+        : "🔵 Couldn't find an earlier appointment.",
     color,
     fields: [
       {
-        name: "Earliest Appointment Date",
+        name: "Earliest Appointment",
         value: earliestAppointmentDate
           ? earliestAppointmentDate.toLocaleString(timeLocale, localeOptions)
           : "Unknown",
         inline: false,
       },
       {
-        name: "Current Appointment Date",
+        name: "Current Appointment",
         value: currentAppointmentDate
           ? currentAppointmentDate.toLocaleString(timeLocale, localeOptions)
           : "Unknown",
         inline: false,
       },
       {
-        name: "Process Start Date",
+        name: "Process Start",
         value: processStartDate.toLocaleString(timeLocale, localeOptions),
         inline: false,
       },
       {
-        name: "Process End Date",
+        name: "Process End",
         value: processEndDate.toLocaleString(timeLocale, localeOptions),
         inline: false,
       },
@@ -87,8 +91,8 @@ export async function sendDiscordNotification(
   const formData = new FormData();
   const content = hasError
     ? `There is an error! <@${discordUserId}>`
-    : foundEarlierDate
-      ? `Found an earlier date! <@${discordUserId}>`
+    : foundEarlierAppointment
+      ? `Found an earlier appointment! <@${discordUserId}>`
       : "Nothing interesting.";
   formData.append(
     "payload_json",
