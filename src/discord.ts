@@ -8,7 +8,6 @@ import {
 import { FormData } from "formdata-node";
 
 type SendMessageOptions = {
-  screenshotBuffer: Buffer;
   currentAppointmentDate: Date | null;
   earliestAppointmentDate: Date | null;
   processStartDate: Date;
@@ -20,7 +19,6 @@ export async function sendDiscordNotification(
 ): Promise<void> {
   console.log("⏳ Sending Discord notification...");
   const {
-    screenshotBuffer,
     currentAppointmentDate,
     earliestAppointmentDate,
     processStartDate,
@@ -41,8 +39,6 @@ export async function sendDiscordNotification(
   const webhookUrl = foundEarlierAppointment
     ? discordSuccessfulWebhookUrl
     : discordUnsuccessfulWebhookUrl;
-
-  const filename = "screenshot-" + Date.now() + ".png";
 
   const processDurationInSeconds = Math.round(
     (processEndDate.getTime() - processStartDate.getTime()) / 1000
@@ -96,8 +92,10 @@ export async function sendDiscordNotification(
       embeds: [embed],
     })
   );
-  const blob = new Blob([screenshotBuffer], { type: "image/png" });
-  formData.append("file", blob, filename);
+
+  /* const filename = "screenshot-" + Date.now() + ".png";
+    const blob = new Blob([screenshotBuffer], { type: "image/png" });
+    formData.append("file", blob, filename); */
 
   const res = await fetch(webhookUrl, {
     method: "POST",

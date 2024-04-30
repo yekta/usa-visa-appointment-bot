@@ -1,132 +1,248 @@
 import puppeteer from "puppeteer-extra";
 import type { Page } from "puppeteer";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import * as moment from "moment-timezone";
 import { randomDelay } from "@/utils.ts";
 import {
-  isProduction,
-  localeOptions,
-  timeLocale,
+  currentAppointmentDate,
   timeZone,
-  usvisaEmail,
-  usvisaRescheduleAppointmentUrl,
-  usvisaPassword,
-  usvisaSignInUrl,
+  timeLocale,
+  localeOptions,
+  appointmentDatesUrl,
+  rescheduleAppointmentUrl,
+  host,
+  signInUrl,
+  email,
+  password,
+  userAgent,
 } from "@/constants";
 import fs from "fs";
+import { IBackOffOptions, backOff } from "exponential-backoff";
 import { sendDiscordNotification } from "@/discord";
-import { backOff, type IBackOffOptions } from "exponential-backoff";
+import moment from "moment-timezone";
 
 puppeteer.use(StealthPlugin());
 
 const puppeteerTimeout = 60000;
-const dateOfAppointmentSelector = "#appointments_consulate_appointment_date";
-const timeOfAppointmentSelector = "#appointments_consulate_appointment_time";
 const screenshotsDir = "screenshots";
 if (!fs.existsSync(screenshotsDir)) {
   fs.mkdirSync(screenshotsDir);
 }
-const resultScreenshotPath = `${screenshotsDir}/result.png`;
+
 const backOffOptions: Partial<IBackOffOptions> = {
-  startingDelay: 5000,
+  startingDelay: 1000,
   timeMultiple: 2,
-  numOfAttempts: 3,
+  numOfAttempts: 10,
   retry: async (e, attemptNumber) => {
     console.log(`🔴 Attempt number ${attemptNumber} failed. Retrying...`);
     return true;
   },
 };
 
-export async function checkAppointmentDate() {
-  try {
-    await checkAppointmentDateUnsafe();
-  } catch (error) {
-    console.error("❌ An error occurred with checkAppointmentDate:", error);
+let page: Page | undefined = undefined;
+
+async function setupPuppeteer() {
+  console.log("Setting up puppeteer...");
+  if (page) {
+    console.log("Puppeteer is already set up.");
+    return page;
   }
-}
-
-async function checkAppointmentDateUnsafe() {
-  const startTime = new Date();
-  console.log("⏳ Process started...");
-
-  let currentAppointmentDate: Date | null = null;
-  let earliestAppointmentDate: Date | null = null;
-
-  let extraArgs = isProduction
-    ? { ignoreHTTPSErrors: true, dumpio: false }
-    : {};
   const browser = await puppeteer.launch({
     headless: true,
     timeout: puppeteerTimeout,
-    args: isProduction ? ["--no-sandbox", "--disable-setuid-sandbox"] : [],
     defaultViewport: {
       width: 1920,
       height: 1080,
     },
-    ...extraArgs,
   });
-  const page = await browser.newPage();
-  page.setDefaultTimeout(puppeteerTimeout);
+  const _page = await browser.newPage();
+  _page.setDefaultTimeout(puppeteerTimeout);
+  page = _page;
+  console.log("Puppeteer is set up.");
+  return page;
+}
 
-  // Main process
-  try {
-    const {
-      currentAppointmentDate: current,
-      earliestAppointmentDate: earliest,
-    } = await backOff(() => mainProcess(page), backOffOptions);
-    currentAppointmentDate = current;
-    earliestAppointmentDate = earliest;
-  } catch (error) {
-    console.log("❌ An error occurred:", error);
-  }
-  // Main process end
+export async function checkAppointmentDate() {
+  const page = await setupPuppeteer();
+  const { csrfToken, cookiesString } = await goToAppointmentUrl(page);
+  const res = await getFormData(page);
+  console.log(res);
 
-  const screenshotBuffer = await page.screenshot({
-    path: resultScreenshotPath,
-  });
-  await browser.close();
-
-  const endTime = new Date();
-
-  await sendDiscordNotification({
-    screenshotBuffer,
-    currentAppointmentDate,
-    earliestAppointmentDate,
-    processStartDate: startTime,
-    processEndDate: endTime,
+  const { firstAvailableDateStr } = await continuouslyLookForEarliestDate({
+    page,
+    cookiesString,
+    csrfToken,
+    currentDate: currentAppointmentDate,
   });
 
-  console.log(`✅ All done!`);
   return;
 }
 
-async function mainProcess(page: Page) {
-  let currentAppointmentDate: Date | null = null;
-  let earliestAppointmentDate: Date | null = null;
+async function continuouslyLookForEarliestDate({
+  page,
+  cookiesString,
+  csrfToken,
+  currentDate,
+}: {
+  page: Page;
+  cookiesString: string;
+  csrfToken: string;
+  currentDate: Date;
+}) {
+  try {
+    const processStartDate = new Date();
+    console.log("Fetching the first available date...");
+    const res = await fetch(appointmentDatesUrl, {
+      method: "GET",
+      headers: {
+        Host: host,
+        Referer: rescheduleAppointmentUrl,
+        "Accept-Encoding": "gzip, deflate, br",
+        Connection: "keep-alive",
+        "Content-Type": "*/*",
+        "X-Csrf-Token": csrfToken,
+        "X-Requested-With": "XMLHttpRequest",
+        Cookie: cookiesString,
+        "User-Agent": userAgent,
+      },
+    });
+    console.log(res.status, res.statusText);
 
-  await signIn(page);
-  currentAppointmentDate = await getCurrentAppointmentDate(page);
+    if (res.status >= 500 && res.status < 600) {
+      console.log(`${res.status} status code. Waiting delay and retrying...`);
+      await randomDelay();
+      return continuouslyLookForEarliestDate({
+        page,
+        cookiesString,
+        csrfToken,
+        currentDate,
+      });
+    }
 
-  await goToRescheduleAppointment(page);
+    if (res.status >= 400 && res.status < 500) {
+      console.log(`${res.status} status code. Waiting delay and retrying...`);
+      await randomDelay();
+      console.log("Doesn't seem to be signed in, refreshing the page...");
+      await page.reload();
+      const { cookiesString: coStr, csrfToken: csStr } =
+        await goToAppointmentUrl(page);
+      return continuouslyLookForEarliestDate({
+        page,
+        cookiesString: coStr,
+        csrfToken: csStr,
+        currentDate,
+      });
+    }
 
-  earliestAppointmentDate = await getEarliestAppointmentDate(page);
-  const foundEarlierDate = earliestAppointmentDate <= currentAppointmentDate;
+    const resJson = await res.json();
 
-  if (foundEarlierDate) {
+    const dates: {
+      date: Date;
+      raw: string;
+    }[] = resJson.map((i: { date: string }) => ({
+      date: moment.tz(i.date, "YYYY-MM-DD", timeZone).toDate(),
+      raw: i.date,
+    }));
+    let firstAvailableDateRaw = dates[0].raw;
+    let firstAvailableDate = dates[0].date;
+    for (let i = 0; i < dates.length; i++) {
+      if (dates[i].date < firstAvailableDate) {
+        firstAvailableDateRaw = dates[i].raw;
+        firstAvailableDate = dates[i].date;
+      }
+    }
     console.log(
-      "🟢 Found an earlier appointment date.",
-      earliestAppointmentDate,
-      currentAppointmentDate
+      "First available date is:",
+      firstAvailableDate.toLocaleString(timeLocale, localeOptions),
+      "///",
+      firstAvailableDateRaw
     );
-  } else {
-    console.log(
-      "🔵 No earlier appointment date.",
-      earliestAppointmentDate,
-      currentAppointmentDate
-    );
+
+    if (firstAvailableDate >= currentDate) {
+      console.log("Checking the availability after delay...");
+      await randomDelay();
+      return continuouslyLookForEarliestDate({
+        page,
+        cookiesString,
+        csrfToken,
+        currentDate,
+      });
+    }
+
+    console.log("🟢 Found an earlier date: ", firstAvailableDate);
+
+    await sendDiscordNotification({
+      currentAppointmentDate,
+      earliestAppointmentDate: firstAvailableDate,
+      processEndDate: new Date(),
+      processStartDate: processStartDate,
+    });
+
+    return { firstAvailableDateStr: firstAvailableDateRaw };
+  } catch (error) {
+    console.log("GetDate error:", error);
+    await randomDelay();
+    return continuouslyLookForEarliestDate({
+      page,
+      cookiesString,
+      csrfToken,
+      currentDate,
+    });
   }
+}
 
-  return { currentAppointmentDate, earliestAppointmentDate };
+async function goToAppointmentUrl(page: Page) {
+  console.log("goToAppointmentUrl function called");
+  try {
+    if (page.url() !== rescheduleAppointmentUrl) {
+      console.log("Navigating to the appointment page...");
+      await page.goto(rescheduleAppointmentUrl);
+      console.log("Current url is:", page.url());
+    }
+    if (page.url() === signInUrl) {
+      console.log("Url is still the sign in page.");
+      await signIn(page);
+      if (page.url() != rescheduleAppointmentUrl) {
+        console.log("Signing in failed. Retrying...");
+        return await goToAppointmentUrl(page);
+      }
+    }
+    const csrfToken = await page.$eval('meta[name="csrf-token"]', (element) =>
+      element.getAttribute("content")
+    );
+    if (!csrfToken) {
+      console.log("CSRF token is not found. Retrying after delay...");
+      await randomDelay();
+      return await goToAppointmentUrl(page);
+    }
+    console.log("CSRF token is: " + csrfToken);
+
+    const cookies = await page.cookies();
+    const cookiesString = cookies
+      .map((cookie) => `${cookie.name}=${cookie.value}`)
+      .join("; ");
+    console.log("Cookies are: " + cookiesString);
+
+    return { csrfToken, cookiesString };
+  } catch (error) {
+    console.log("GoToAppointmentUrl error:", error);
+    await randomDelay();
+    return await goToAppointmentUrl(page);
+  }
+}
+
+async function getFormData(page: Page) {
+  const authenticityToken = await page.$eval(
+    '[name="authenticity_token"]',
+    (element) => element.getAttribute("value")
+  );
+  const useConsulateAppointmentCapacity = await page.$eval(
+    '[name="use_consulate_appointment_capacity"]',
+    (element) => element.getAttribute("value")
+  );
+  return {
+    authenticityToken,
+    useConsulateAppointmentCapacity,
+  };
 }
 
 async function signIn(page: Page) {
@@ -140,16 +256,13 @@ async function signIn(page: Page) {
   const modalSelector = "div.infoPopUp";
   const modalCloseButtonSelector = 'button[title="Close"]';
 
-  console.log("Visiting the sign in page");
-  await page.goto(usvisaSignInUrl);
-
   // check if there is a modal
   const modal = await page.$(modalSelector);
   if (modal) {
     console.log("Closing the modal");
     await page.click(modalCloseButtonSelector);
     console.log("Waiting for the modal to close with a delay...");
-    await randomDelay(4000, 5000);
+    await randomDelay();
   }
 
   console.log(
@@ -162,14 +275,14 @@ async function signIn(page: Page) {
   ]);
 
   console.log("Typing the email and password");
-  await page.type(emailSelector, usvisaEmail);
-  await page.type(passwordSelector, usvisaPassword);
+  await page.type(emailSelector, email);
+  await page.type(passwordSelector, password);
 
   console.log("Clicking the accept policy button");
   const [] = await Promise.all([page.click(acceptPolicySelector)]);
 
   console.log("Waiting for delay before clicking sign in button");
-  await randomDelay(3000, 4000);
+  await randomDelay();
 
   console.log("Clicking the sign in button and waiting for the  navigation");
   const [] = await Promise.all([
@@ -178,159 +291,5 @@ async function signIn(page: Page) {
   ]);
 
   console.log("✅ Signed in successfully.");
-}
-
-async function getCurrentAppointmentDate(page: Page) {
-  console.log("⏳ Getting current appointment date...");
-
-  const paragraphSelector = "p.consular-appt";
-
-  const rawAppointmentDate = await page.$eval(
-    paragraphSelector,
-    (el) => el.textContent
-  );
-  if (!rawAppointmentDate) {
-    throw new Error("Appointment date not found.");
-  }
-  const parsedDate = rawAppointmentDate.split(" ").slice(0, 5).join(" ");
-  const date = moment.tz(parsedDate, "D MMMM, YYYY, HH:mm", timeZone);
-  const dateJS = date.toDate();
-  const dateStr = dateJS.toLocaleString(timeLocale, localeOptions);
-
-  console.log("✅ Got the current appointment date:", dateStr);
-  return dateJS;
-}
-
-async function goToRescheduleAppointment(page: Page) {
-  console.log("⏳ Visiting the get appointment page...");
-  await page.goto(usvisaRescheduleAppointmentUrl);
-  console.log("✅ Arrived at get appointment page successfully.");
-}
-
-async function getEarliestAppointmentDate(page: Page) {
-  const earliestAppointmentDateString =
-    await getAndSelectEarliestAppointmentDateOnly(page);
-  const earliestAppointmentTimeString =
-    await getAndSelectEarliestAppointmentTimeOnly(page);
-  const earliestAppointmentDateTime = `${earliestAppointmentDateString} ${earliestAppointmentTimeString}`;
-  const earliestDateMoment = moment.tz(
-    earliestAppointmentDateTime,
-    "D MMMM YYYY HH:mm",
-    timeZone
-  );
-  return earliestDateMoment.toDate();
-}
-
-async function getAndSelectEarliestAppointmentDateOnly(page: Page) {
-  console.log("⏳ Finding and selecting the earliest appointment date...");
-
-  console.log("Waiting for date of appointment selector...");
-  await page.waitForSelector(dateOfAppointmentSelector);
-
-  console.log("Waiting a random delay for the date of appointment selector...");
-  await randomDelay(5000, 6000);
-
-  console.log("Clicking the date of appointment input");
-  const [] = await Promise.all([page.click(dateOfAppointmentSelector)]);
-
-  console.log("Waiting for delay before running the recursive function...");
-  await randomDelay(2000, 3000);
-
-  let earliestDate = await recursivelyFindAndClickEarliestDateOnly(page);
-  console.log(
-    "✅ Found and selected the earliest appointment date:",
-    earliestDate
-  );
-
-  return earliestDate;
-}
-
-async function recursivelyFindAndClickEarliestDateOnly(page: Page, i = 0) {
-  const nextButtonSelector = "a.ui-datepicker-next";
-  const cellSelector = "tbody td";
-  let firstAvailableDateString: string | null = null;
-  const dateCells = await page.$$(cellSelector);
-  for (let i = 0; i < dateCells.length; i++) {
-    const dateCell = dateCells[i];
-    const isAvailable = await page.evaluate(
-      (el) => el.getAttribute("data-event") === "click",
-      dateCell
-    );
-    if (isAvailable) {
-      // get the table containing the date
-      const header = await dateCell.evaluate((el) => {
-        const datePickerGroup = el.closest("div.ui-datepicker-group");
-        if (!datePickerGroup) {
-          throw new Error("Could not find the date picker group");
-        }
-        const header = datePickerGroup.querySelector(".ui-datepicker-title");
-        if (!header) {
-          throw new Error("Could not find the header of the date picker group");
-        }
-        return header.textContent;
-      }, dateCell);
-      const cellText = await dateCell.evaluate((el) => el.textContent);
-      const rawDate = `${cellText} ${header}`;
-      firstAvailableDateString = rawDate.replace(/\s/g, " ");
-      console.log("First available date:", rawDate);
-      const [] = await Promise.all([dateCell.click()]);
-      await randomDelay(5000, 6000);
-      break;
-    }
-  }
-  if (firstAvailableDateString) {
-    return firstAvailableDateString;
-  }
-  const [] = await Promise.all([page.click(nextButtonSelector)]);
-
-  await randomDelay(500, 1000);
-  return recursivelyFindAndClickEarliestDateOnly(page, i + 1);
-}
-
-async function getAndSelectEarliestAppointmentTimeOnly(page: Page) {
-  console.log("⏳ Finding and selecting the earliest appointment time...");
-  const consularSectionSelector =
-    "#appointments_consulate_appointment_facility_id";
-
-  console.log("Waiting delay for consular section...");
-  await randomDelay(2000, 3000);
-  console.log("Clicking the consular section");
-  await page.click(consularSectionSelector);
-  await page.click(consularSectionSelector);
-
-  console.log("Waiting for the time select element to load...");
-  await randomDelay(5000, 6000);
-
-  console.log("Finding the earliest time string...");
-  const earliestTime = await page.evaluate((selector) => {
-    const select = document.querySelector(selector);
-    if (!select) {
-      throw new Error("Could not find the time select element");
-    }
-    const earliestOption = Array.from(select.children).find(
-      (option) => option.textContent !== ""
-    );
-    if (!earliestOption) {
-      throw new Error("Couldn't find the earliest option");
-    }
-    return earliestOption.textContent;
-  }, timeOfAppointmentSelector);
-
-  if (!earliestTime) {
-    throw new Error("Could not find the earliest appointment time.");
-  }
-
-  console.log("Selecting the earliest time...");
-  await page.select(timeOfAppointmentSelector, earliestTime);
-
-  console.log("Waiting for delay");
-  await randomDelay(1000, 1500);
-
-  const earliestTimeFormatted = earliestTime.replace(/\s/g, " ");
-  console.log(
-    "✅ Found and selected the earliest appointment time: ",
-    earliestTimeFormatted
-  );
-
-  return earliestTimeFormatted;
+  console.log("Url after sign in is: " + page.url());
 }
