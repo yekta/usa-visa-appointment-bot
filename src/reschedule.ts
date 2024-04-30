@@ -1,5 +1,4 @@
 import { rescheduleAppointmentUrl, userAgent } from "@/constants";
-import { FormData } from "formdata-node";
 
 interface TRescheduleProps {
   utf8: string;

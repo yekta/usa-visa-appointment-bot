@@ -16,6 +16,7 @@ import { sendDiscordNotification } from "@/discord";
 import moment from "moment-timezone";
 import { setupPuppeteer } from "@/puppeteer";
 import { signIn } from "@/signIn";
+import { getRescheduleFormData } from "@/rescheduleForm";
 
 const screenshotsDir = "screenshots";
 if (!fs.existsSync(screenshotsDir)) {
@@ -28,7 +29,7 @@ export async function checkAppointmentDate() {
   try {
     const page = await setupPuppeteer(currentPage);
     const { csrfToken, cookiesString } = await goToAppointmentUrl(page);
-    const res = await getFormData(page);
+    const res = await getRescheduleFormData(page);
     console.log(res);
 
     const { firstAvailableDateStr } = await continuouslyLookForEarliestDate({
@@ -194,19 +195,4 @@ async function goToAppointmentUrl(page: Page) {
     await randomDelay();
     return await goToAppointmentUrl(page);
   }
-}
-
-async function getFormData(page: Page) {
-  const authenticityToken = await page.$eval(
-    '[name="authenticity_token"]',
-    (element) => element.getAttribute("value")
-  );
-  const useConsulateAppointmentCapacity = await page.$eval(
-    '[name="use_consulate_appointment_capacity"]',
-    (element) => element.getAttribute("value")
-  );
-  return {
-    authenticityToken,
-    useConsulateAppointmentCapacity,
-  };
 }
