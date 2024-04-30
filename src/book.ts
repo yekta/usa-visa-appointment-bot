@@ -1,29 +1,31 @@
-import { rescheduleAppointmentUrl, userAgent } from "@/constants";
+import {
+  facilitiyId,
+  host,
+  rescheduleAppointmentUrl,
+  userAgent,
+} from "@/constants";
 
 interface TRescheduleProps {
-  utf8: string;
-  authenticityToken: string;
-  confirmedByLimitMessage: string;
-  useConsulateAppointmentCapacity: string;
-  facilityId: string;
+  csrfToken: string;
   dateStr: string;
   timeStr: string;
   cookiesString: string;
 }
 
-export async function reschedule(props: TRescheduleProps) {
+export async function book(props: TRescheduleProps) {
   const headers = {
+    Host: host,
     "User-Agent": userAgent,
     Cookie: props.cookiesString,
     Referer: rescheduleAppointmentUrl,
+    "Content-Type": "application/x-www-form-urlencoded",
   };
 
   const body = new URLSearchParams({
-    utf8: "✓",
-    authenticity_token: props.authenticityToken,
-    confirmed_by_limit_message: props.confirmedByLimitMessage,
-    use_consulate_appointment_capacity: props.useConsulateAppointmentCapacity,
-    "appointments[consulate_appointment][facility_id]": props.facilityId,
+    confirmed_by_limit_message: "1",
+    use_consulate_appointment_capacity: "true",
+    authenticity_token: props.csrfToken,
+    "appointments[consulate_appointment][facility_id]": facilitiyId,
     "appointments[consulate_appointment][date]": props.dateStr,
     "appointments[consulate_appointment][time]": props.timeStr,
   });
@@ -41,4 +43,5 @@ export async function reschedule(props: TRescheduleProps) {
 
   const resText = await res.text();
   console.log(resText);
+  return resText;
 }
