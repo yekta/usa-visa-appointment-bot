@@ -1,6 +1,4 @@
-import puppeteer from "puppeteer-extra";
 import type { Page } from "puppeteer";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { randomDelay } from "@/utils.ts";
 import {
   currentAppointmentDate,
@@ -11,69 +9,37 @@ import {
   rescheduleAppointmentUrl,
   host,
   signInUrl,
-  email,
-  password,
   userAgent,
 } from "@/constants";
 import fs from "fs";
-import { IBackOffOptions, backOff } from "exponential-backoff";
 import { sendDiscordNotification } from "@/discord";
 import moment from "moment-timezone";
+import { setupPuppeteer } from "@/puppeteer";
+import { signIn } from "@/signIn";
 
-puppeteer.use(StealthPlugin());
-
-const puppeteerTimeout = 60000;
 const screenshotsDir = "screenshots";
 if (!fs.existsSync(screenshotsDir)) {
   fs.mkdirSync(screenshotsDir);
 }
 
-const backOffOptions: Partial<IBackOffOptions> = {
-  startingDelay: 1000,
-  timeMultiple: 2,
-  numOfAttempts: 10,
-  retry: async (e, attemptNumber) => {
-    console.log(`🔴 Attempt number ${attemptNumber} failed. Retrying...`);
-    return true;
-  },
-};
-
-let page: Page | undefined = undefined;
-
-async function setupPuppeteer() {
-  console.log("Setting up puppeteer...");
-  if (page) {
-    console.log("Puppeteer is already set up.");
-    return page;
-  }
-  const browser = await puppeteer.launch({
-    headless: true,
-    timeout: puppeteerTimeout,
-    defaultViewport: {
-      width: 1920,
-      height: 1080,
-    },
-  });
-  const _page = await browser.newPage();
-  _page.setDefaultTimeout(puppeteerTimeout);
-  page = _page;
-  console.log("Puppeteer is set up.");
-  return page;
-}
+let currentPage: Page | undefined = undefined;
 
 export async function checkAppointmentDate() {
-  const page = await setupPuppeteer();
-  const { csrfToken, cookiesString } = await goToAppointmentUrl(page);
-  const res = await getFormData(page);
-  console.log(res);
+  try {
+    const page = await setupPuppeteer(currentPage);
+    const { csrfToken, cookiesString } = await goToAppointmentUrl(page);
+    const res = await getFormData(page);
+    console.log(res);
 
-  const { firstAvailableDateStr } = await continuouslyLookForEarliestDate({
-    page,
-    cookiesString,
-    csrfToken,
-    currentDate: currentAppointmentDate,
-  });
-
+    const { firstAvailableDateStr } = await continuouslyLookForEarliestDate({
+      page,
+      cookiesString,
+      csrfToken,
+      currentDate: currentAppointmentDate,
+    });
+  } catch (error) {
+    console.log("CheckAppointmentDate error:", error);
+  }
   return;
 }
 
@@ -243,53 +209,4 @@ async function getFormData(page: Page) {
     authenticityToken,
     useConsulateAppointmentCapacity,
   };
-}
-
-async function signIn(page: Page) {
-  console.log("⏳ Signing in...");
-
-  const emailSelector = "#user_email";
-  const passwordSelector = "#user_password";
-  const acceptPolicySelector = "#policy_confirmed";
-  const signInButtonSelector = 'input[name="commit"]';
-
-  const modalSelector = "div.infoPopUp";
-  const modalCloseButtonSelector = 'button[title="Close"]';
-
-  // check if there is a modal
-  const modal = await page.$(modalSelector);
-  if (modal) {
-    console.log("Closing the modal");
-    await page.click(modalCloseButtonSelector);
-    console.log("Waiting for the modal to close with a delay...");
-    await randomDelay();
-  }
-
-  console.log(
-    "Waiting for the email, password and accept policy inputs to load..."
-  );
-  const [] = await Promise.all([
-    page.waitForSelector(emailSelector),
-    page.waitForSelector(passwordSelector),
-    page.waitForSelector(acceptPolicySelector),
-  ]);
-
-  console.log("Typing the email and password");
-  await page.type(emailSelector, email);
-  await page.type(passwordSelector, password);
-
-  console.log("Clicking the accept policy button");
-  const [] = await Promise.all([page.click(acceptPolicySelector)]);
-
-  console.log("Waiting for delay before clicking sign in button");
-  await randomDelay();
-
-  console.log("Clicking the sign in button and waiting for the  navigation");
-  const [] = await Promise.all([
-    page.waitForNavigation(),
-    page.click(signInButtonSelector),
-  ]);
-
-  console.log("✅ Signed in successfully.");
-  console.log("Url after sign in is: " + page.url());
 }
