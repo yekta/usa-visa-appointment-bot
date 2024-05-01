@@ -1,5 +1,5 @@
 {
-  "name": "usa-visa",
+  "name": "usa-visa-appointment-bot",
   "version": "1.0.0",
   "description": "A tool for checking appointment dates for USA visa",
   "main": "dist/main.js",
