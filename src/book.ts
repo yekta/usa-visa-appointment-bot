@@ -4,6 +4,7 @@ import {
   rescheduleAppointmentUrl,
   userAgent,
 } from "@/constants";
+import { consoleLog } from "@/utils";
 
 interface TRescheduleProps {
   csrfToken: string;
@@ -36,12 +37,12 @@ export async function book(props: TRescheduleProps) {
     body,
   });
 
-  console.log(res.status, res.statusText);
+  consoleLog(res.status, res.statusText);
   if (!res.ok) {
-    console.log("Error rescheduling appointment");
+    consoleLog("Error rescheduling appointment");
   }
 
   const resText = await res.text();
-  console.log(resText);
+  consoleLog(resText);
   return resText;
 }

@@ -5,6 +5,7 @@ import {
   localeOptions,
   timeLocale,
 } from "@/constants";
+import { consoleLog } from "@/utils";
 import { FormData } from "formdata-node";
 
 type SendMessageOptions = {
@@ -17,7 +18,7 @@ type SendMessageOptions = {
 export async function sendDiscordNotification(
   options: SendMessageOptions
 ): Promise<void> {
-  console.log("⏳ Sending Discord notification...");
+  consoleLog("⏳ Sending Discord notification...");
   const {
     currentAppointmentDate,
     earliestAppointmentDate,
@@ -104,9 +105,9 @@ export async function sendDiscordNotification(
   });
 
   if (!res.ok) {
-    console.log(res.status, res.statusText);
+    consoleLog(res.status, res.statusText);
     throw new Error("❌ Failed to send Discord notification.");
   }
 
-  console.log("✅ Discord notification sent successfully.");
+  consoleLog("✅ Discord notification sent successfully.");
 }

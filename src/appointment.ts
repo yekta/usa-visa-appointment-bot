@@ -1,5 +1,5 @@
 import type { Page } from "puppeteer";
-import { randomDelay, randomDelayAfterError } from "@/utils.ts";
+import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils.ts";
 import {
   timeZone,
   timeLocale,
@@ -45,7 +45,7 @@ export async function bookEarlierAppointment({
       });
 
     if (firstAvailableDate >= minDate && firstAvailableDate < currentDate) {
-      console.log("Can book this appointment date:", firstAvailableDateStr);
+      consoleLog("Can book this appointment date:", firstAvailableDateStr);
       const { firstAvailableTimeStr } = await continuouslyGetEarliestTime({
         page,
         cookiesString,
@@ -58,11 +58,11 @@ export async function bookEarlierAppointment({
         dateStr: firstAvailableDateStr,
         timeStr: firstAvailableTimeStr,
       });
-      console.log("🟢 Booking is completed: ", res);
-      console.log(res);
+      consoleLog("🟢 Booking is completed:", res);
+      consoleLog(res);
     }
   } catch (error) {
-    console.log("CheckAppointmentDate error:", error);
+    consoleLog("CheckAppointmentDate error:", error);
   }
   return;
 }
@@ -80,7 +80,7 @@ async function continuouslyGetEarliestDate({
 }) {
   try {
     const processStartDate = new Date();
-    console.log("Fetching the first available date...");
+    consoleLog("Fetching the first available date...");
     const res = await fetch(appointmentDatesUrl, {
       method: "GET",
       headers: {
@@ -95,10 +95,10 @@ async function continuouslyGetEarliestDate({
         "User-Agent": userAgent,
       },
     });
-    console.log(res.status, res.statusText);
+    consoleLog(res.status, res.statusText);
 
     if (res.status >= 500 && res.status < 600) {
-      console.log(`${res.status} status code. Waiting delay and retrying...`);
+      consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelayAfterError();
       return continuouslyGetEarliestDate({
         page,
@@ -109,9 +109,9 @@ async function continuouslyGetEarliestDate({
     }
 
     if (res.status >= 400 && res.status < 500) {
-      console.log(`${res.status} status code. Waiting delay and retrying...`);
+      consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelayAfterError();
-      console.log("Doesn't seem to be signed in, refreshing the page...");
+      consoleLog("Doesn't seem to be signed in, refreshing the page...");
       await page.reload();
       const { cookiesString: coStr, csrfToken: csStr } =
         await goToAppointmentUrl(page);
@@ -140,7 +140,7 @@ async function continuouslyGetEarliestDate({
         firstAvailableDate = dates[i].date;
       }
     }
-    console.log(
+    consoleLog(
       "First available date is:",
       firstAvailableDate.toLocaleString(timeLocale, localeOptions),
       "///",
@@ -148,7 +148,7 @@ async function continuouslyGetEarliestDate({
     );
 
     if (firstAvailableDate >= currentDate) {
-      console.log("Checking the availability after delay...");
+      consoleLog("Checking the availability after delay...");
       await randomDelay();
       return continuouslyGetEarliestDate({
         page,
@@ -158,7 +158,7 @@ async function continuouslyGetEarliestDate({
       });
     }
 
-    console.log("🟢 Found an earlier date: ", firstAvailableDate);
+    consoleLog("🟢 Found an earlier date:", firstAvailableDate);
 
     await sendDiscordNotification({
       currentAppointmentDate: currentDate,
@@ -169,7 +169,7 @@ async function continuouslyGetEarliestDate({
 
     return { firstAvailableDateStr: firstAvailableDateRaw, firstAvailableDate };
   } catch (error) {
-    console.log("GetDate error:", error);
+    consoleLog("GetDate error:", error);
     await randomDelayAfterError();
     return continuouslyGetEarliestDate({
       page,
@@ -192,7 +192,7 @@ async function continuouslyGetEarliestTime({
   dateStr: string;
 }) {
   try {
-    console.log("Fetching the first available time for: ", dateStr);
+    consoleLog("Fetching the first available time for:", dateStr);
     const res = await fetch(getAppointmentTimesUrl(dateStr), {
       method: "GET",
       headers: {
@@ -208,9 +208,9 @@ async function continuouslyGetEarliestTime({
       },
     });
     const firstAvailableTimeStr = "";
-    console.log(res.status, res.statusText);
+    consoleLog(res.status, res.statusText);
 
-    console.log(
+    consoleLog(
       "🟢 Successfully fetched the first available time: ",
       firstAvailableTimeStr,
       " for date: ",
@@ -219,7 +219,7 @@ async function continuouslyGetEarliestTime({
 
     return { firstAvailableTimeStr };
   } catch (error) {
-    console.log("GetTime error:", error);
+    consoleLog("GetTime error:", error);
     await randomDelayAfterError();
     return continuouslyGetEarliestTime({
       page,
@@ -231,18 +231,18 @@ async function continuouslyGetEarliestTime({
 }
 
 async function goToAppointmentUrl(page: Page) {
-  console.log("goToAppointmentUrl function called");
+  consoleLog("goToAppointmentUrl function called");
   try {
     if (page.url() !== rescheduleAppointmentUrl) {
-      console.log("Navigating to the appointment page...");
+      consoleLog("Navigating to the appointment page...");
       await page.goto(rescheduleAppointmentUrl);
-      console.log("Current url is:", page.url());
+      consoleLog("Current url is:", page.url());
     }
     if (page.url() === signInUrl) {
-      console.log("Url is still the sign in page.");
+      consoleLog("Url is still the sign in page.");
       await signIn(page);
       if (page.url() != rescheduleAppointmentUrl) {
-        console.log("Signing in failed. Retrying...");
+        consoleLog("Signing in failed. Retrying...");
         return await goToAppointmentUrl(page);
       }
     }
@@ -250,22 +250,22 @@ async function goToAppointmentUrl(page: Page) {
       element.getAttribute("content")
     );
     if (!csrfToken) {
-      console.log("CSRF token is not found. Retrying after delay...");
+      consoleLog("CSRF token is not found. Retrying after delay...");
       await randomDelayAfterError();
       return await goToAppointmentUrl(page);
     }
-    console.log("CSRF token is: " + csrfToken);
+    consoleLog("CSRF token is:" + csrfToken);
 
     const cookies = await page.cookies();
     const cookiesString = cookies
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join("; ");
-    console.log("Cookies are: " + cookiesString);
+    consoleLog("Cookies are:" + cookiesString);
 
     return { csrfToken, cookiesString };
   } catch (error) {
-    console.log("GoToAppointmentUrl error:", error);
-    console.log("Retrying after delay...");
+    consoleLog("GoToAppointmentUrl error:", error);
+    consoleLog("Retrying after delay...");
     await randomDelayAfterError();
     return await goToAppointmentUrl(page);
   }

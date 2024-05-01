@@ -1,15 +1,16 @@
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import type { Page } from "puppeteer";
+import { consoleLog } from "@/utils";
 
 puppeteer.use(StealthPlugin());
 
 const puppeteerTimeout = 60000;
 
 export async function setupPuppeteer(page: Page | undefined) {
-  console.log("Setting up puppeteer...");
+  consoleLog("Setting up puppeteer...");
   if (page) {
-    console.log("Puppeteer is already set up.");
+    consoleLog("Puppeteer is already set up.");
     return page;
   }
   const browser = await puppeteer.launch({
@@ -23,6 +24,6 @@ export async function setupPuppeteer(page: Page | undefined) {
   const _page = await browser.newPage();
   _page.setDefaultTimeout(puppeteerTimeout);
   page = _page;
-  console.log("Puppeteer is set up.");
+  consoleLog("Puppeteer is set up.");
   return page;
 }

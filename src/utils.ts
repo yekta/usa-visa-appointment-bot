@@ -1,3 +1,7 @@
+import { processStartDate } from "@/constants";
+import fs from "fs";
+import util from "util";
+
 export async function randomDelay(
   minMs: number = 10000,
   maxMs: number = 11000
@@ -8,4 +12,32 @@ export async function randomDelay(
 
 export async function randomDelayAfterError() {
   return randomDelay(15000, 16000);
+}
+
+const logsFolder = "logs";
+const startDateISO = processStartDate.toISOString();
+
+export function consoleLog(...args: any[]): void {
+  const currentDateISO = new Date().toISOString();
+  const message = args
+    .map((arg) =>
+      typeof arg === "object" ? util.inspect(arg, { depth: null }) : arg
+    )
+    .join(" ");
+  const timestampedMessage = `${currentDateISO} | ${message}`;
+  console.log(timestampedMessage);
+  fs.mkdir(logsFolder, { recursive: true }, (err) => {
+    if (err) {
+      console.error("Failed to create logs folder:", err);
+    }
+  });
+  fs.appendFile(
+    `${logsFolder}/${startDateISO}.txt`,
+    timestampedMessage + "\n",
+    (err) => {
+      if (err) {
+        console.error("Failed to write to file:", err);
+      }
+    }
+  );
 }
