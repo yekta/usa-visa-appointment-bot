@@ -7,7 +7,6 @@ import {
   appointmentDatesUrl,
   rescheduleAppointmentUrl,
   host,
-  signInUrl,
   userAgent,
   getAppointmentTimesUrl,
 } from "@/constants";
@@ -15,8 +14,8 @@ import fs from "fs";
 import { sendDiscordNotification } from "@/discord";
 import moment from "moment-timezone";
 import { setupPuppeteer } from "@/puppeteer";
-import { signIn } from "@/signIn";
 import { book } from "@/book";
+import { getSession } from "@/session";
 
 const screenshotsDir = "screenshots";
 if (!fs.existsSync(screenshotsDir)) {
@@ -34,7 +33,7 @@ export async function bookEarlierAppointment({
 }) {
   try {
     const page = await setupPuppeteer(currentPage);
-    const { csrfToken, cookiesString } = await goToAppointmentUrl(page);
+    const { csrfToken, cookiesString } = await getSession({ page });
 
     const { firstAvailableDate, firstAvailableDateStr } =
       await continuouslyGetEarliestDate({
@@ -62,7 +61,7 @@ export async function bookEarlierAppointment({
       consoleLog(res);
     }
   } catch (error) {
-    consoleLog("CheckAppointmentDate error:", error);
+    consoleLog("bookEarlierDate error:", error);
   }
   return;
 }
@@ -111,10 +110,11 @@ async function continuouslyGetEarliestDate({
     if (res.status >= 400 && res.status < 500) {
       consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelayAfterError();
-      consoleLog("Doesn't seem to be signed in, refreshing the page...");
-      await page.reload();
-      const { cookiesString: coStr, csrfToken: csStr } =
-        await goToAppointmentUrl(page);
+      consoleLog("Doesn't seem to be signed in, getting session...");
+      const { cookiesString: coStr, csrfToken: csStr } = await getSession({
+        page,
+        reload: true,
+      });
       return continuouslyGetEarliestDate({
         page,
         cookiesString: coStr,
@@ -227,46 +227,5 @@ async function continuouslyGetEarliestTime({
       csrfToken,
       dateStr,
     });
-  }
-}
-
-async function goToAppointmentUrl(page: Page) {
-  consoleLog("goToAppointmentUrl function called");
-  try {
-    if (page.url() !== rescheduleAppointmentUrl) {
-      consoleLog("Navigating to the appointment page...");
-      await page.goto(rescheduleAppointmentUrl);
-      consoleLog("Current url is:", page.url());
-    }
-    if (page.url() === signInUrl) {
-      consoleLog("Url is still the sign in page.");
-      await signIn(page);
-      if (page.url() != rescheduleAppointmentUrl) {
-        consoleLog("Signing in failed. Retrying...");
-        return await goToAppointmentUrl(page);
-      }
-    }
-    const csrfToken = await page.$eval('meta[name="csrf-token"]', (element) =>
-      element.getAttribute("content")
-    );
-    if (!csrfToken) {
-      consoleLog("CSRF token is not found. Retrying after delay...");
-      await randomDelayAfterError();
-      return await goToAppointmentUrl(page);
-    }
-    consoleLog("CSRF token is:" + csrfToken);
-
-    const cookies = await page.cookies();
-    const cookiesString = cookies
-      .map((cookie) => `${cookie.name}=${cookie.value}`)
-      .join("; ");
-    consoleLog("Cookies are:" + cookiesString);
-
-    return { csrfToken, cookiesString };
-  } catch (error) {
-    consoleLog("GoToAppointmentUrl error:", error);
-    consoleLog("Retrying after delay...");
-    await randomDelayAfterError();
-    return await goToAppointmentUrl(page);
   }
 }

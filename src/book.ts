@@ -14,12 +14,13 @@ interface TRescheduleProps {
 }
 
 export async function book(props: TRescheduleProps) {
-  const headers = {
+  let headers = {
     Host: host,
     "User-Agent": userAgent,
     Cookie: props.cookiesString,
     Referer: rescheduleAppointmentUrl,
     "Content-Type": "application/x-www-form-urlencoded",
+    "X-CSRF-Token": props.csrfToken,
   };
 
   const body = new URLSearchParams({
