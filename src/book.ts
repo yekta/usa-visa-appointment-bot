@@ -14,6 +14,7 @@ interface TRescheduleProps {
 }
 
 export async function book(props: TRescheduleProps) {
+  consoleLog(`Booking appointment for: ${props.dateStr} ${props.timeStr}...`);
   let headers = {
     Host: host,
     "User-Agent": userAgent,
@@ -40,10 +41,10 @@ export async function book(props: TRescheduleProps) {
 
   consoleLog(res.status, res.statusText);
   if (!res.ok) {
-    consoleLog("Error rescheduling appointment");
+    consoleLog("Error booking appointment");
   }
 
   const resText = await res.text();
-  consoleLog(resText);
+  consoleLog("🎉🎉🎉 Booked appointment:", resText);
   return resText;
 }
