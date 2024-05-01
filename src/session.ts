@@ -1,9 +1,4 @@
-import {
-  email,
-  password,
-  rescheduleAppointmentUrl,
-  signInUrl,
-} from "@/constants";
+import { email, password, appointmentUrl, signInUrl } from "@/constants";
 import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils";
 import { Page } from "puppeteer";
 
@@ -19,15 +14,15 @@ export async function getSession({
     if (reload) {
       await page.reload();
     }
-    if (page.url() !== rescheduleAppointmentUrl) {
+    if (page.url() !== appointmentUrl) {
       consoleLog("Navigating to the appointment page...");
-      await page.goto(rescheduleAppointmentUrl);
+      await page.goto(appointmentUrl);
       consoleLog("Current url is:", page.url());
     }
     if (page.url() === signInUrl) {
       consoleLog("Url is still the sign in page.");
       await signIn(page);
-      if (page.url() != rescheduleAppointmentUrl) {
+      if (page.url() != appointmentUrl) {
         consoleLog("Signing in failed. Retrying...");
         return await getSession({ page: page });
       }

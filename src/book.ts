@@ -1,9 +1,4 @@
-import {
-  facilitiyId,
-  host,
-  rescheduleAppointmentUrl,
-  userAgent,
-} from "@/constants";
+import { facilitiyId, host, appointmentUrl, userAgent } from "@/constants";
 import { consoleLog } from "@/utils";
 
 interface TRescheduleProps {
@@ -19,7 +14,7 @@ export async function book(props: TRescheduleProps) {
     Host: host,
     "User-Agent": userAgent,
     Cookie: props.cookiesString,
-    Referer: rescheduleAppointmentUrl,
+    Referer: appointmentUrl,
     "Content-Type": "application/x-www-form-urlencoded",
     "X-CSRF-Token": props.csrfToken,
   };
@@ -33,7 +28,7 @@ export async function book(props: TRescheduleProps) {
     "appointments[consulate_appointment][time]": props.timeStr,
   });
 
-  const res = await fetch(rescheduleAppointmentUrl, {
+  const res = await fetch(appointmentUrl, {
     method: "POST",
     headers,
     body,

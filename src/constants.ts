@@ -33,15 +33,16 @@ export const password = process.env.PASSWORD || "";
 export const scheduleId = process.env.SCHEDULE_ID || "";
 export const facilitiyId = process.env.FACILITY_ID || "";
 export const countryCode = process.env.COUNTRY_CODE || "";
-export const signInUrl = `https://ais.usvisa-info.com/${countryCode}/niv/users/sign_in`;
-export const appointmentDatesUrl =
-  `https://ais.usvisa-info.com/${countryCode}/niv/schedule` +
-  `/${scheduleId}/appointment/days/${facilitiyId}.json?appointments[expedite]=false`;
-export const getAppointmentTimesUrl = (date: string) =>
-  `https://ais.usvisa-info.com/${countryCode}/niv/schedule` +
-  `/${scheduleId}/appointment/times/${facilitiyId}.json?date=${date}&appointments[expedite]=false`;
+
 export const host = "ais.usvisa-info.com";
-export const rescheduleAppointmentUrl = `https://ais.usvisa-info.com/${countryCode}/niv/schedule/${scheduleId}/appointment`;
+const baseUrl = `https://${host}/${countryCode}/niv`;
+export const signInUrl = `${baseUrl}/users/sign_in`;
+export const appointmentUrl = `${baseUrl}/schedule/${scheduleId}/appointment`;
+export const appointmentDatesUrl =
+  appointmentUrl + `/days/${facilitiyId}.json?appointments[expedite]=false`;
+export const getAppointmentTimesUrl = (date: string) =>
+  appointmentUrl +
+  `/times/${facilitiyId}.json?date=${date}&appointments[expedite]=false`;
 
 export const userAgent =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";

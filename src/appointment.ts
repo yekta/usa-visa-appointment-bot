@@ -5,7 +5,7 @@ import {
   timeLocale,
   localeOptions,
   appointmentDatesUrl,
-  rescheduleAppointmentUrl,
+  appointmentUrl,
   host,
   userAgent,
   getAppointmentTimesUrl,
@@ -84,7 +84,7 @@ async function continuouslyGetEarliestDate({
       method: "GET",
       headers: {
         Host: host,
-        Referer: rescheduleAppointmentUrl,
+        Referer: appointmentUrl,
         "Accept-Encoding": "gzip, deflate, br",
         Connection: "keep-alive",
         "Content-Type": "*/*",
@@ -197,7 +197,7 @@ async function continuouslyGetEarliestTime({
       method: "GET",
       headers: {
         Host: host,
-        Referer: rescheduleAppointmentUrl,
+        Referer: appointmentUrl,
         "Accept-Encoding": "gzip, deflate, br",
         Connection: "keep-alive",
         "Content-Type": "*/*",
