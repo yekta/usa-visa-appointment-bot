@@ -1,7 +1,4 @@
-import dotenv from "dotenv";
 import moment from "moment-timezone";
-
-dotenv.config();
 
 export const timeZone = process.env.TIME_ZONE || "";
 export const timeLocale = process.env.TIME_LOCALE || "";
