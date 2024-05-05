@@ -2,6 +2,8 @@ import { email, password, appointmentUrl, signInUrl } from "@/constants";
 import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils";
 import { Page } from "puppeteer";
 
+const longDelay = 10 * 60 * 1000;
+
 export async function getSession({
   page,
   reload = false,
@@ -46,8 +48,12 @@ export async function getSession({
     return { csrfToken, cookiesString };
   } catch (error) {
     consoleLog("getSession error:", error);
-    consoleLog("Retrying after delay...");
-    await randomDelayAfterError();
+    consoleLog(
+      `Risky error detected! Retrying after ${Math.round(
+        longDelay / 1000 / 60
+      )} minutes...`
+    );
+    await randomDelay(longDelay, longDelay + 1000);
     return await getSession({ page });
   }
 }
