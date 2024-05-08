@@ -74,12 +74,12 @@ export async function continuouslyGetEarliestTime({
       });
     }
 
-    const resJson: { available_times: string[]; business_times: string[] } =
+    const resJson: { available_times?: string[]; business_times?: string[] } =
       await res.json();
 
     const combinedSet = new Set([
-      ...resJson.available_times,
-      ...resJson.business_times,
+      ...(resJson.available_times ?? []),
+      ...(resJson.business_times ?? []),
     ]);
 
     const combinedArray = Array.from(combinedSet);
