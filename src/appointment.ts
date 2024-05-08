@@ -39,7 +39,8 @@ export async function bookEarlierAppointment({
         page,
         cookiesString,
         csrfToken,
-        currentDate: currentDate,
+        currentDate,
+        minDate,
       });
 
     sendDiscordNotification({
@@ -49,7 +50,7 @@ export async function bookEarlierAppointment({
       processStartDate: processStartDate,
     });
 
-    if (firstAvailableDate >= minDate && firstAvailableDate < currentDate) {
+    if (firstAvailableDate < currentDate && firstAvailableDate >= minDate) {
       consoleLog("Can book this appointment date:", firstAvailableDateStr);
       const { firstAvailableTimeStr } = await continuouslyGetEarliestTime({
         page,

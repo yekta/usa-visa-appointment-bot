@@ -8,6 +8,7 @@ import {
   timeZone,
   userAgent,
 } from "@/constants";
+import { sendDiscordNotification } from "@/discord";
 import { getSession } from "@/session";
 import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils";
 import moment from "moment-timezone";
@@ -18,13 +19,16 @@ export async function continuouslyGetEarliestDate({
   cookiesString,
   csrfToken,
   currentDate,
+  minDate,
 }: {
   page: Page;
   cookiesString: string;
   csrfToken: string;
   currentDate: Date;
+  minDate: Date;
 }) {
   try {
+    const processStartDate = new Date();
     consoleLog("Fetching the first available date...");
     const res = await fetch(appointmentDatesUrl, {
       method: "GET",
@@ -50,6 +54,7 @@ export async function continuouslyGetEarliestDate({
         cookiesString,
         csrfToken,
         currentDate,
+        minDate,
       });
     }
 
@@ -66,6 +71,7 @@ export async function continuouslyGetEarliestDate({
         cookiesString: coStr,
         csrfToken: csStr,
         currentDate,
+        minDate,
       });
     }
 
@@ -93,7 +99,20 @@ export async function continuouslyGetEarliestDate({
       firstAvailableDateRaw
     );
 
-    if (firstAvailableDate >= currentDate) {
+    if (firstAvailableDate >= currentDate || firstAvailableDate < minDate) {
+      if (firstAvailableDate < minDate) {
+        consoleLog(
+          "🟡 Found available earlier date but it's earlier than min appointment date.",
+          firstAvailableDate,
+          minDate
+        );
+        sendDiscordNotification({
+          currentAppointmentDate: currentDate,
+          earliestAppointmentDate: firstAvailableDate,
+          processEndDate: new Date(),
+          processStartDate: processStartDate,
+        });
+      }
       consoleLog("Checking the availability after delay...");
       await randomDelay();
       return await continuouslyGetEarliestDate({
@@ -101,6 +120,7 @@ export async function continuouslyGetEarliestDate({
         cookiesString,
         csrfToken,
         currentDate,
+        minDate,
       });
     }
 
@@ -119,6 +139,7 @@ export async function continuouslyGetEarliestDate({
       cookiesString,
       csrfToken,
       currentDate,
+      minDate,
     });
   }
 }
