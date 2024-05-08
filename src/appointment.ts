@@ -6,6 +6,7 @@ import { book } from "@/book";
 import { getSession } from "@/session";
 import { continuouslyGetEarliestDate } from "@/earliestDate";
 import { continuouslyGetEarliestTime } from "@/earliestTime";
+import { sendDiscordNotification } from "@/discord";
 
 const screenshotsDir = "screenshots";
 if (!fs.existsSync(screenshotsDir)) {
@@ -21,7 +22,15 @@ export async function bookEarlierAppointment({
   currentDate: Date;
   minDate: Date;
 }) {
+  consoleLog(
+    "Current Appointment Date",
+    currentDate,
+    "///",
+    "Minimum Appointment Date",
+    minDate
+  );
   try {
+    const processStartDate = new Date();
     const page = await setupPuppeteer(currentPage);
     const { csrfToken, cookiesString } = await getSession({ page });
 
@@ -32,6 +41,13 @@ export async function bookEarlierAppointment({
         csrfToken,
         currentDate: currentDate,
       });
+
+    sendDiscordNotification({
+      currentAppointmentDate: currentDate,
+      earliestAppointmentDate: firstAvailableDate,
+      processEndDate: new Date(),
+      processStartDate: processStartDate,
+    });
 
     if (firstAvailableDate >= minDate && firstAvailableDate < currentDate) {
       consoleLog("Can book this appointment date:", firstAvailableDateStr);
@@ -49,6 +65,18 @@ export async function bookEarlierAppointment({
       });
       consoleLog("🟢 Booking is completed:", res);
       consoleLog(res);
+    } else if (firstAvailableDate < minDate) {
+      consoleLog(
+        "🟡 The first available date is earlier than the min appointment date.",
+        firstAvailableDate,
+        minDate
+      );
+    } else {
+      consoleLog(
+        "🟡 The first available date is not earlier than the current appointment date.",
+        firstAvailableDate,
+        currentDate
+      );
     }
   } catch (error) {
     consoleLog("bookEarlierDate error:", error);

@@ -1,9 +1,13 @@
 import moment from "moment-timezone";
 
+const nowMs = new Date().getTime();
 export const timeZone = process.env.TIME_ZONE || "";
 export const timeLocale = process.env.TIME_LOCALE || "";
 const currentAppointmentDateRaw = process.env.CURRENT_APPOINTMENT_DATE || "";
-const minAppointmentDateRaw = process.env.MIN_APPOINTMENT_DATE || "";
+const minAppointmentDateThresholdInDays = Number(
+  process.env.MIN_APPOINTMENT_DATE_THRESHOLD_IN_DAYS || ""
+);
+
 export const localeOptions: Intl.DateTimeFormatOptions = {
   timeZone: timeZone,
   month: "long",
@@ -15,9 +19,9 @@ export const localeOptions: Intl.DateTimeFormatOptions = {
 export const currentAppointmentDate = moment
   .tz(currentAppointmentDateRaw, "D MMMM, YYYY, HH:mm", timeZone)
   .toDate();
-export const minAppointmentDate = moment
-  .tz(minAppointmentDateRaw, "D MMMM, YYYY, HH:mm", timeZone)
-  .toDate();
+export const minAppointmentDate = new Date(
+  nowMs + 1000 * 60 * 60 * 24 * minAppointmentDateThresholdInDays
+);
 
 export const discordSuccessfulWebhookUrl =
   process.env.DISCORD_SUCCESSFUL_WEBHOOK_URL || "";

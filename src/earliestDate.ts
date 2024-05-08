@@ -7,7 +7,6 @@ import {
   timeZone,
   userAgent,
 } from "@/constants";
-import { sendDiscordNotification } from "@/discord";
 import { getSession } from "@/session";
 import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils";
 import moment from "moment-timezone";
@@ -25,7 +24,6 @@ export async function continuouslyGetEarliestDate({
   currentDate: Date;
 }) {
   try {
-    const processStartDate = new Date();
     consoleLog("Fetching the first available date...");
     const res = await fetch(appointmentDatesUrl, {
       method: "GET",
@@ -106,14 +104,6 @@ export async function continuouslyGetEarliestDate({
     }
 
     consoleLog("🟢 Found an earlier date:", firstAvailableDate);
-
-    await sendDiscordNotification({
-      currentAppointmentDate: currentDate,
-      earliestAppointmentDate: firstAvailableDate,
-      processEndDate: new Date(),
-      processStartDate: processStartDate,
-    });
-
     return { firstAvailableDateStr: firstAvailableDateRaw, firstAvailableDate };
   } catch (error) {
     consoleLog("GetDate error:", error);
