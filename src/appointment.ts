@@ -23,10 +23,10 @@ export async function bookEarlierAppointment({
   minDate: Date;
 }) {
   consoleLog(
-    "Current Appointment Date",
+    "Current Appointment Date:",
     currentDate,
-    "///",
-    "Minimum Appointment Date",
+    " /// ",
+    "Minimum Appointment Date:",
     minDate
   );
   try {
