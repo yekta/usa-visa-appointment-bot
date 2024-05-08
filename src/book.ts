@@ -34,9 +34,10 @@ export async function book(props: TRescheduleProps) {
     body,
   });
 
-  consoleLog(res.status, res.statusText);
+  consoleLog(res.status, res.statusText, res);
   if (!res.ok) {
     consoleLog("Error booking appointment");
+    throw new Error("Error booking appointment");
   }
 
   const resText = await res.text();
