@@ -56,9 +56,7 @@ export async function continuouslyGetEarliestDate({
 
     if (res.status >= 400 && res.status < 500) {
       consoleLog(`${res.status} status code.`);
-      consoleLog(
-        "🔐 Doesn't seem to be signed in, getting session after delay..."
-      );
+      consoleLog("🔐 Doesn't seem to be signed in, signing in after delay...");
       await randomDelayAfterError();
       const { cookiesString: coStr, csrfToken: csStr } = await getSession({
         page,
