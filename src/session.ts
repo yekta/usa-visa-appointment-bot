@@ -1,8 +1,12 @@
-import { email, password, appointmentUrl, signInUrl } from "@/constants";
+import {
+  email,
+  password,
+  appointmentUrl,
+  signInUrl,
+  longDelay,
+} from "@/constants";
 import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils";
 import { Page } from "puppeteer";
-
-const longDelay = 15 * 60 * 1000;
 
 export async function getSession({
   page,

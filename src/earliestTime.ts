@@ -53,7 +53,7 @@ export async function continuouslyGetEarliestTime({
         page,
         reload: true,
       });
-      return continuouslyGetEarliestTime({
+      return await continuouslyGetEarliestTime({
         page,
         cookiesString: coStr,
         csrfToken: csStr,
@@ -65,7 +65,7 @@ export async function continuouslyGetEarliestTime({
     if (res.status >= 500 && res.status < 600) {
       consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelay(3000, 4000);
-      return continuouslyGetEarliestTime({
+      return await continuouslyGetEarliestTime({
         page,
         cookiesString,
         csrfToken,
@@ -87,7 +87,7 @@ export async function continuouslyGetEarliestTime({
     if (combinedArray.length === 0) {
       consoleLog("No available time slots found. Retrying...");
       await randomDelay(3000, 4000);
-      return continuouslyGetEarliestTime({
+      return await continuouslyGetEarliestTime({
         page,
         cookiesString,
         csrfToken,
@@ -109,7 +109,7 @@ export async function continuouslyGetEarliestTime({
   } catch (error) {
     consoleLog("GetTime error:", error);
     await randomDelayAfterError();
-    return continuouslyGetEarliestTime({
+    return await continuouslyGetEarliestTime({
       page,
       cookiesString,
       csrfToken,

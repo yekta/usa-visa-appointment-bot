@@ -3,6 +3,7 @@ import {
   appointmentUrl,
   host,
   localeOptions,
+  longDelay,
   timeLocale,
   timeZone,
   userAgent,
@@ -44,7 +45,7 @@ export async function continuouslyGetEarliestDate({
     if (res.status >= 500 && res.status < 600) {
       consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelayAfterError();
-      return continuouslyGetEarliestDate({
+      return await continuouslyGetEarliestDate({
         page,
         cookiesString,
         csrfToken,
@@ -60,7 +61,7 @@ export async function continuouslyGetEarliestDate({
         page,
         reload: true,
       });
-      return continuouslyGetEarliestDate({
+      return await continuouslyGetEarliestDate({
         page,
         cookiesString: coStr,
         csrfToken: csStr,
@@ -95,7 +96,7 @@ export async function continuouslyGetEarliestDate({
     if (firstAvailableDate >= currentDate) {
       consoleLog("Checking the availability after delay...");
       await randomDelay();
-      return continuouslyGetEarliestDate({
+      return await continuouslyGetEarliestDate({
         page,
         cookiesString,
         csrfToken,
@@ -107,8 +108,13 @@ export async function continuouslyGetEarliestDate({
     return { firstAvailableDateStr: firstAvailableDateRaw, firstAvailableDate };
   } catch (error) {
     consoleLog("GetDate error:", error);
-    await randomDelayAfterError();
-    return continuouslyGetEarliestDate({
+    consoleLog(
+      `Risky error detected! Retrying after ${Math.round(
+        longDelay / 1000 / 60
+      )} minutes...`
+    );
+    await randomDelay(longDelay, longDelay + 1000);
+    return await continuouslyGetEarliestDate({
       page,
       cookiesString,
       csrfToken,

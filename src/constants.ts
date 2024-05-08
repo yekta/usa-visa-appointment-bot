@@ -1,6 +1,8 @@
 import moment from "moment-timezone";
 
+export const longDelay = 15 * 60 * 1000;
 const nowMs = new Date().getTime();
+
 export const timeZone = process.env.TIME_ZONE || "";
 export const timeLocale = process.env.TIME_LOCALE || "";
 const currentAppointmentDateRaw = process.env.CURRENT_APPOINTMENT_DATE || "";
