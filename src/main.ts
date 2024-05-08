@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { bookEarlierAppointment } from "@/appointment.ts";
 import { currentAppointmentDate, minAppointmentDate } from "@/constants";
 import express from "express";

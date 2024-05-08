@@ -3,15 +3,15 @@ import fs from "fs";
 import util from "util";
 
 export async function randomDelay(
-  minMs: number = 10000,
-  maxMs: number = 11000
+  minMs: number = 15000,
+  maxMs: number = 16000
 ) {
   const delay = Math.floor(Math.random() * (maxMs - minMs + 1) + minMs);
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
 export async function randomDelayAfterError() {
-  return randomDelay(15000, 16000);
+  return randomDelay(30000, 31000);
 }
 
 const logsFolder = "logs";

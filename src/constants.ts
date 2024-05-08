@@ -31,6 +31,12 @@ export const scheduleId = process.env.SCHEDULE_ID || "";
 export const facilitiyId = process.env.FACILITY_ID || "";
 export const countryCode = process.env.COUNTRY_CODE || "";
 
+if (!email || !password || !scheduleId || !facilitiyId || !countryCode) {
+  throw new Error(
+    "Please provide all the required environment variables: EMAIL, PASSWORD, SCHEDULE_ID, FACILITY_ID, COUNTRY_CODE"
+  );
+}
+
 export const host = "ais.usvisa-info.com";
 const baseUrl = `https://${host}/${countryCode}/niv`;
 export const signInUrl = `${baseUrl}/users/sign_in`;
