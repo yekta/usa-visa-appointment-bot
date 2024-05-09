@@ -15,12 +15,16 @@ export async function book(props: TRescheduleProps) {
     "User-Agent": userAgent,
     Cookie: props.cookiesString,
     Referer: appointmentUrl,
+    "Referrer-Policy": "strict-origin-when-cross-origin",
     "Content-Type": "application/x-www-form-urlencoded",
     "X-CSRF-Token": props.csrfToken,
+    "Cache-Control": "no-store",
+    Connection: "keep-alive",
   };
 
   const body = new URLSearchParams({
-    confirmed_by_limit_message: "1",
+    utf8: "✓",
+    confirmed_limit_message: "1",
     use_consulate_appointment_capacity: "true",
     authenticity_token: props.csrfToken,
     "appointments[consulate_appointment][facility_id]": facilitiyId,
@@ -30,6 +34,7 @@ export async function book(props: TRescheduleProps) {
 
   const res = await fetch(appointmentUrl, {
     method: "POST",
+    redirect: "follow",
     headers,
     body,
   });
