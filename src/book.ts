@@ -32,7 +32,8 @@ export async function book(props: TRescheduleProps) {
     "appointments[consulate_appointment][time]": props.timeStr,
   });
 
-  consoleLog("Body params:", body);
+  consoleLog("Request Body:", body);
+  consoleLog("Request Headers:", headers);
 
   const res = await fetch(appointmentUrl, {
     method: "POST",
