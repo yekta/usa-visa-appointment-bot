@@ -5,7 +5,7 @@ const nowMs = new Date().getTime();
 
 export const timeZone = process.env.TIME_ZONE || "";
 export const timeLocale = process.env.TIME_LOCALE || "";
-const currentAppointmentDateRaw = "2027 November, 2024, 10:00" || "";
+const currentAppointmentDateRaw = process.env.CURRENT_APPOINTMENT_DATE || "";
 const minAppointmentDateThresholdInDays = Number(
   process.env.MIN_APPOINTMENT_DATE_THRESHOLD_IN_DAYS || ""
 );
@@ -24,6 +24,8 @@ export const currentAppointmentDate = moment
 export const minAppointmentDate = new Date(
   nowMs + 1000 * 60 * 60 * 24 * minAppointmentDateThresholdInDays
 );
+
+console.log(currentAppointmentDate);
 
 export const discordSuccessfulWebhookUrl =
   process.env.DISCORD_SUCCESSFUL_WEBHOOK_URL || "";
