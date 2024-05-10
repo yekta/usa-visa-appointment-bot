@@ -5,7 +5,7 @@ const nowMs = new Date().getTime();
 
 export const timeZone = process.env.TIME_ZONE || "";
 export const timeLocale = process.env.TIME_LOCALE || "";
-const currentAppointmentDateRaw = process.env.CURRENT_APPOINTMENT_DATE || "";
+const currentAppointmentDateRaw = "2027 November, 2024, 10:00" || "";
 const minAppointmentDateThresholdInDays = Number(
   process.env.MIN_APPOINTMENT_DATE_THRESHOLD_IN_DAYS || ""
 );
