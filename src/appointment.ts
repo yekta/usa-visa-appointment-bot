@@ -1,5 +1,5 @@
 import type { Page } from "puppeteer";
-import { consoleLog } from "@/utils.ts";
+import { consoleLog, randomDelay } from "@/utils.ts";
 import fs from "fs";
 import { setupPuppeteer } from "@/puppeteer";
 import { book } from "@/book";
@@ -7,13 +7,12 @@ import { getSession } from "@/session";
 import { continuouslyGetEarliestDate } from "@/earliestDate";
 import { continuouslyGetEarliestTime } from "@/earliestTime";
 import { sendDiscordNotification } from "@/discord";
+import { longDelay } from "@/constants";
 
 const screenshotsDir = "screenshots";
 if (!fs.existsSync(screenshotsDir)) {
   fs.mkdirSync(screenshotsDir);
 }
-
-let currentPage: Page | undefined = undefined;
 
 export async function bookEarlierAppointment({
   currentDate,
@@ -31,7 +30,7 @@ export async function bookEarlierAppointment({
   );
   try {
     const processStartDate = new Date();
-    const page = await setupPuppeteer(currentPage);
+    const page = await setupPuppeteer();
     const { csrfToken, cookiesString } = await getSession({ page });
 
     const { firstAvailableDate, firstAvailableDateStr } =
@@ -81,6 +80,10 @@ export async function bookEarlierAppointment({
     }
   } catch (error) {
     consoleLog("bookEarlierDate error:", error);
+    consoleLog("Dangerous error occured. Retrying after long delay.");
+    await randomDelay(longDelay, longDelay + 10000);
+    await bookEarlierAppointment({ currentDate, minDate });
+    return;
   }
   return;
 }
