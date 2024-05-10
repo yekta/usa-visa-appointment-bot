@@ -25,8 +25,6 @@ export const minAppointmentDate = new Date(
   nowMs + 1000 * 60 * 60 * 24 * minAppointmentDateThresholdInDays
 );
 
-console.log(currentAppointmentDate);
-
 export const discordSuccessfulWebhookUrl =
   process.env.DISCORD_SUCCESSFUL_WEBHOOK_URL || "";
 export const discordUnsuccessfulWebhookUrl =
