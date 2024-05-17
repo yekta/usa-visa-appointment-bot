@@ -77,6 +77,18 @@ export async function continuouslyGetEarliestDate({
 
     const resJson = await res.json();
 
+    if (resJson.length === 0) {
+      consoleLog("No available dates found.");
+      await randomDelay();
+      return await continuouslyGetEarliestDate({
+        page,
+        cookiesString,
+        csrfToken,
+        currentDate,
+        minDate,
+      });
+    }
+
     const dates: {
       date: Date;
       raw: string;
