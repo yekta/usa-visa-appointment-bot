@@ -78,7 +78,7 @@ export async function continuouslyGetEarliestDate({
     const resJson = await res.json();
 
     if (resJson.length === 0) {
-      consoleLog("No available dates found.");
+      consoleLog("No available dates found. Checking again after delay...");
       await randomDelay();
       return await continuouslyGetEarliestDate({
         page,
