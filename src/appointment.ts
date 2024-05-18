@@ -6,8 +6,12 @@ import { book } from "@/book";
 import { getSession } from "@/session";
 import { continuouslyGetEarliestDate } from "@/earliestDate";
 import { continuouslyGetEarliestTime } from "@/earliestTime";
-import { sendDiscordNotification } from "@/discord";
-import { longDelay } from "@/constants";
+import {
+  sendAppointmentBookedDiscordNotification,
+  sendDiscordNotification,
+} from "@/discord";
+import { longDelay, timeZone } from "@/constants";
+import moment from "moment-timezone";
 
 const screenshotsDir = "screenshots";
 if (!fs.existsSync(screenshotsDir)) {
@@ -63,8 +67,24 @@ export async function bookEarlierAppointment({
         dateStr: firstAvailableDateStr,
         timeStr: firstAvailableTimeStr,
       });
+
       consoleLog("🟢 Booking is completed:", res);
-      consoleLog(res);
+
+      const newDateTz = moment.tz(
+        firstAvailableDateStr + " " + firstAvailableTimeStr,
+        "YYYY-MM-DD HH:mm",
+        timeZone
+      );
+      const newDateStr = newDateTz.format("D MMMM, YYYY, HH:mm");
+
+      if (res.includes(newDateStr)) {
+        consoleLog("🟢🎉🟢 Booking confirmed! 🟢🎉🟢");
+        const newDate = newDateTz.toDate();
+        await sendAppointmentBookedDiscordNotification({
+          oldAppointmentDate: currentDate,
+          newAppointmentDate: newDate,
+        });
+      }
     } else if (firstAvailableDate < minDate) {
       consoleLog(
         "🟡 The first available date is earlier than the min appointment date.",

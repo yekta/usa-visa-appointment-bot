@@ -95,10 +95,6 @@ export async function sendDiscordNotification(
       })
     );
 
-    /* const filename = "screenshot-" + Date.now() + ".png";
-    const blob = new Blob([screenshotBuffer], { type: "image/png" });
-    formData.append("file", blob, filename); */
-
     const res = await fetch(webhookUrl, {
       method: "POST",
       // @ts-ignore
@@ -113,5 +109,73 @@ export async function sendDiscordNotification(
     consoleLog("✅ Discord notification sent successfully.");
   } catch (error) {
     consoleLog("❌ Error sending Discord notification:", error);
+  }
+}
+
+export async function sendAppointmentBookedDiscordNotification({
+  newAppointmentDate,
+  oldAppointmentDate,
+}: {
+  newAppointmentDate: Date;
+  oldAppointmentDate: Date;
+}) {
+  try {
+    consoleLog("⏳ Sending Discord notification for booked appointment...");
+    const color = 0x2ecc71;
+    const webhookUrl = discordSuccessfulWebhookUrl;
+
+    const embed = {
+      title: "🟢🎉 Booked earlier appointment! 🎉🟢",
+      color,
+      fields: [
+        {
+          name: "New Appointment",
+          value: newAppointmentDate.toLocaleString(timeLocale, localeOptions),
+          inline: false,
+        },
+        {
+          name: "Old Appointment",
+          value: oldAppointmentDate.toLocaleString(timeLocale, localeOptions),
+          inline: false,
+        },
+        {
+          name: "Current Time",
+          value: new Date().toLocaleString(timeLocale, localeOptions),
+          inline: false,
+        },
+      ],
+    };
+
+    const formData = new FormData();
+    const content = `Booked earlier appointment! <@${discordUserId}>`;
+    formData.append(
+      "payload_json",
+      JSON.stringify({
+        content: content,
+        embeds: [embed],
+      })
+    );
+
+    const res = await fetch(webhookUrl, {
+      method: "POST",
+      // @ts-ignore
+      body: formData,
+    });
+
+    if (!res.ok) {
+      consoleLog(res.status, res.statusText);
+      throw new Error(
+        "❌ Failed to send Discord notification for booked appointment."
+      );
+    }
+
+    consoleLog(
+      "✅ Discord notification for booked appointment sent successfully."
+    );
+  } catch (error) {
+    consoleLog(
+      "❌ Error sending Discord notification for appoinment booked:",
+      error
+    );
   }
 }
