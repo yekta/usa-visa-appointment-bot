@@ -2,6 +2,7 @@ import {
   appointmentUrl,
   getAppointmentTimesUrl,
   host,
+  sharedHeaders,
   userAgent,
 } from "@/constants";
 import { getSession } from "@/session";
@@ -35,11 +36,12 @@ export async function continuouslyGetEarliestTime({
         Referer: appointmentUrl,
         "Accept-Encoding": "gzip, deflate, br",
         Connection: "keep-alive",
-        "Content-Type": "*/*",
+        Accept: "*/*",
         "X-Csrf-Token": csrfToken,
         "X-Requested-With": "XMLHttpRequest",
         Cookie: cookiesString,
         "User-Agent": userAgent,
+        ...sharedHeaders,
       },
     });
     let firstAvailableTimeStr = "";

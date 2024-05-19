@@ -4,6 +4,7 @@ import {
   host,
   localeOptions,
   longDelay,
+  sharedHeaders,
   timeLocale,
   timeZone,
   userAgent,
@@ -37,11 +38,12 @@ export async function continuouslyGetEarliestDate({
         Referer: appointmentUrl,
         "Accept-Encoding": "gzip, deflate, br",
         Connection: "keep-alive",
-        "Content-Type": "*/*",
+        Accept: "*/*",
         "X-Csrf-Token": csrfToken,
         "X-Requested-With": "XMLHttpRequest",
         Cookie: cookiesString,
         "User-Agent": userAgent,
+        ...sharedHeaders,
       },
     });
     consoleLog(res.status, res.statusText);

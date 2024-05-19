@@ -1,4 +1,10 @@
-import { facilitiyId, host, appointmentUrl, userAgent } from "@/constants";
+import {
+  facilitiyId,
+  host,
+  appointmentUrl,
+  userAgent,
+  sharedHeaders,
+} from "@/constants";
 import { consoleLog } from "@/utils";
 
 interface TRescheduleProps {
@@ -20,6 +26,7 @@ export async function book(props: TRescheduleProps) {
     "X-CSRF-Token": props.csrfToken,
     "Cache-Control": "no-store",
     Connection: "keep-alive",
+    ...sharedHeaders,
   };
 
   const body = new URLSearchParams({

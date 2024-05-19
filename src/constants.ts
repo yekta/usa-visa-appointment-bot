@@ -54,6 +54,14 @@ export const getAppointmentTimesUrl = (date: string) =>
   `/times/${facilitiyId}.json?date=${date}&appointments[expedite]=false`;
 
 export const userAgent =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
 
 export const processStartDate = new Date();
+
+export const sharedHeaders = {
+  "Sec-Ch-Ua": `"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"`,
+  "Sec-Ch-Ua-Mobile": "?0",
+  "Sec-Fetch-Dest": "empty",
+  "Sec-Fetch-Mode": "cors",
+  "Sec-Fetch-Site": "same-origin",
+};
