@@ -1,6 +1,7 @@
 import {
   appointmentDatesUrl,
   appointmentUrl,
+  facilityId,
   host,
   localeOptions,
   longDelay,
@@ -125,6 +126,7 @@ export async function continuouslyGetEarliestDate({
           earliestAppointmentDate: firstAvailableDate,
           processEndDate: new Date(),
           processStartDate: processStartDate,
+          facilityId,
         });
       }
       consoleLog("Checking the availability after delay...");

@@ -10,7 +10,7 @@ import {
   sendAppointmentBookedDiscordNotification,
   sendDiscordNotification,
 } from "@/discord";
-import { longDelay, timeZone } from "@/constants";
+import { facilityId, longDelay, timeZone } from "@/constants";
 import moment from "moment-timezone";
 
 const screenshotsDir = "screenshots";
@@ -56,6 +56,7 @@ export async function bookEarlierAppointment({
       earliestAppointmentDate: firstAvailableDate,
       processEndDate: new Date(),
       processStartDate: processStartDate,
+      facilityId,
     });
 
     if (
@@ -92,6 +93,7 @@ export async function bookEarlierAppointment({
         await sendAppointmentBookedDiscordNotification({
           oldAppointmentDate: currentDate,
           newAppointmentDate: newDate,
+          facilityId,
         });
       }
     } else {

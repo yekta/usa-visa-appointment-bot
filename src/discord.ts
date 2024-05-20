@@ -13,6 +13,7 @@ type SendMessageOptions = {
   earliestAppointmentDate: Date | null;
   processStartDate: Date;
   processEndDate: Date;
+  facilityId: string;
 };
 
 export async function sendDiscordNotification(
@@ -25,6 +26,7 @@ export async function sendDiscordNotification(
       earliestAppointmentDate,
       processStartDate,
       processEndDate,
+      facilityId,
     } = options;
 
     const hasError = !currentAppointmentDate || !earliestAppointmentDate;
@@ -66,6 +68,11 @@ export async function sendDiscordNotification(
           value: currentAppointmentDate
             ? currentAppointmentDate.toLocaleString(timeLocale, localeOptions)
             : "Unknown",
+          inline: false,
+        },
+        {
+          name: "Facility ID",
+          value: facilityId,
           inline: false,
         },
         {
@@ -115,9 +122,11 @@ export async function sendDiscordNotification(
 export async function sendAppointmentBookedDiscordNotification({
   newAppointmentDate,
   oldAppointmentDate,
+  facilityId,
 }: {
   newAppointmentDate: Date;
   oldAppointmentDate: Date;
+  facilityId: string;
 }) {
   try {
     consoleLog("⏳ Sending Discord notification for booked appointment...");
@@ -136,6 +145,11 @@ export async function sendAppointmentBookedDiscordNotification({
         {
           name: "Old Appointment",
           value: oldAppointmentDate.toLocaleString(timeLocale, localeOptions),
+          inline: false,
+        },
+        {
+          name: "Facility ID",
+          value: facilityId,
           inline: false,
         },
         {

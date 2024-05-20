@@ -39,10 +39,10 @@ export const discordUserId = process.env.DISCORD_USER_ID || "";
 export const email = process.env.EMAIL || "";
 export const password = process.env.PASSWORD || "";
 export const scheduleId = process.env.SCHEDULE_ID || "";
-export const facilitiyId = process.env.FACILITY_ID || "";
+export const facilityId = process.env.FACILITY_ID || "";
 export const countryCode = process.env.COUNTRY_CODE || "";
 
-if (!email || !password || !scheduleId || !facilitiyId || !countryCode) {
+if (!email || !password || !scheduleId || !facilityId || !countryCode) {
   throw new Error(
     "Please provide all the required environment variables: EMAIL, PASSWORD, SCHEDULE_ID, FACILITY_ID, COUNTRY_CODE"
   );
@@ -53,10 +53,10 @@ const baseUrl = `https://${host}/${countryCode}/niv`;
 export const signInUrl = `${baseUrl}/users/sign_in`;
 export const appointmentUrl = `${baseUrl}/schedule/${scheduleId}/appointment`;
 export const appointmentDatesUrl =
-  appointmentUrl + `/days/${facilitiyId}.json?appointments[expedite]=false`;
+  appointmentUrl + `/days/${facilityId}.json?appointments[expedite]=false`;
 export const getAppointmentTimesUrl = (date: string) =>
   appointmentUrl +
-  `/times/${facilitiyId}.json?date=${date}&appointments[expedite]=false`;
+  `/times/${facilityId}.json?date=${date}&appointments[expedite]=false`;
 
 export const userAgent =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";

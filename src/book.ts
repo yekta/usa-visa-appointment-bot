@@ -1,5 +1,5 @@
 import {
-  facilitiyId,
+  facilityId,
   host,
   appointmentUrl,
   userAgent,
@@ -34,7 +34,7 @@ export async function book(props: TRescheduleProps) {
     confirmed_limit_message: "1",
     use_consulate_appointment_capacity: "true",
     authenticity_token: props.csrfToken,
-    "appointments[consulate_appointment][facility_id]": facilitiyId,
+    "appointments[consulate_appointment][facility_id]": facilityId,
     "appointments[consulate_appointment][date]": props.dateStr,
     "appointments[consulate_appointment][time]": props.timeStr,
   });
