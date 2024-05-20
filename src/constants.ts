@@ -1,5 +1,6 @@
 import moment from "moment-timezone";
 
+export const shortDelay = 60 * 1000;
 export const longDelay = 15 * 60 * 1000;
 const nowMs = new Date().getTime();
 

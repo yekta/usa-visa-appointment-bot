@@ -10,7 +10,7 @@ import {
   sendAppointmentBookedDiscordNotification,
   sendDiscordNotification,
 } from "@/discord";
-import { facilityId, longDelay, timeZone } from "@/constants";
+import { facilityId, longDelay, shortDelay, timeZone } from "@/constants";
 import moment from "moment-timezone";
 
 const screenshotsDir = "screenshots";
@@ -118,14 +118,14 @@ export async function bookEarlierAppointment({
           maxDate
         );
       }
-      consoleLog("Not bookable, checking the availability after delay...");
-      await randomDelay();
+      consoleLog("Not bookable, checking the availability after shortDelay...");
+      await randomDelay(shortDelay, shortDelay + 10000);
       await bookEarlierAppointment({ currentDate, maxDate, minDate });
       return;
     }
   } catch (error) {
     consoleLog("bookEarlierDate error:", error);
-    consoleLog("Dangerous error occured. Retrying after long delay.");
+    consoleLog("Dangerous error occured. Retrying after longDelay.");
     await randomDelay(longDelay, longDelay + 10000);
     await bookEarlierAppointment({ currentDate, maxDate, minDate });
     return;
