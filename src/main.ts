@@ -1,6 +1,10 @@
 import "dotenv/config";
 import { bookEarlierAppointment } from "@/appointment.ts";
-import { currentAppointmentDate, minAppointmentDate } from "@/constants";
+import {
+  currentAppointmentDate,
+  maxAppointmentDate,
+  minAppointmentDate,
+} from "@/constants";
 import express from "express";
 const app = express();
 
@@ -10,5 +14,6 @@ app.get("/health", (req, res) => {
 
 bookEarlierAppointment({
   currentDate: currentAppointmentDate,
+  maxDate: maxAppointmentDate,
   minDate: minAppointmentDate,
 });

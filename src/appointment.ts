@@ -20,14 +20,19 @@ if (!fs.existsSync(screenshotsDir)) {
 
 export async function bookEarlierAppointment({
   currentDate,
+  maxDate,
   minDate,
 }: {
   currentDate: Date;
+  maxDate: Date;
   minDate: Date;
 }) {
   consoleLog(
     "Current Appointment Date:",
     currentDate,
+    " /// ",
+    "Maxiumum Appointment Date:",
+    maxDate,
     " /// ",
     "Minimum Appointment Date:",
     minDate
@@ -53,7 +58,11 @@ export async function bookEarlierAppointment({
       processStartDate: processStartDate,
     });
 
-    if (firstAvailableDate < currentDate && firstAvailableDate >= minDate) {
+    if (
+      firstAvailableDate < currentDate &&
+      firstAvailableDate >= minDate &&
+      firstAvailableDate <= maxDate
+    ) {
       consoleLog("Can book this appointment date:", firstAvailableDateStr);
       const { firstAvailableTimeStr } = await continuouslyGetEarliestTime({
         page,
@@ -85,24 +94,38 @@ export async function bookEarlierAppointment({
           newAppointmentDate: newDate,
         });
       }
-    } else if (firstAvailableDate < minDate) {
-      consoleLog(
-        "🟡 The first available date is earlier than the min appointment date.",
-        firstAvailableDate,
-        minDate
-      );
     } else {
-      consoleLog(
-        "🟡 The first available date is not earlier than the current appointment date.",
-        firstAvailableDate,
-        currentDate
-      );
+      if (firstAvailableDate < minDate) {
+        consoleLog(
+          "🟡 The first available date is earlier than the min appointment date.",
+          firstAvailableDate,
+          minDate
+        );
+      }
+      if (firstAvailableDate >= currentDate) {
+        consoleLog(
+          "🟡 The first available date is not earlier than the current appointment date.",
+          firstAvailableDate,
+          currentDate
+        );
+      }
+      if (firstAvailableDate > maxDate) {
+        consoleLog(
+          "🟡 The first available date is later than the max appointment date.",
+          firstAvailableDate,
+          maxDate
+        );
+      }
+      consoleLog("Not bookable, checking the availability after delay...");
+      await randomDelay();
+      await bookEarlierAppointment({ currentDate, maxDate, minDate });
+      return;
     }
   } catch (error) {
     consoleLog("bookEarlierDate error:", error);
     consoleLog("Dangerous error occured. Retrying after long delay.");
     await randomDelay(longDelay, longDelay + 10000);
-    await bookEarlierAppointment({ currentDate, minDate });
+    await bookEarlierAppointment({ currentDate, maxDate, minDate });
     return;
   }
   return;
