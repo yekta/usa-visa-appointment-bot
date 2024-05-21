@@ -15,7 +15,10 @@ export async function randomDelayAfterError() {
 }
 
 const logsFolder = "logs";
-const startDateISO = processStartDate.toISOString();
+const fileName = processStartDate
+  .toISOString()
+  .replaceAll(":", "-")
+  .replace(".", "-");
 
 export function consoleLog(...args: any[]): void {
   const currentDateISO = new Date().toISOString();
@@ -32,7 +35,7 @@ export function consoleLog(...args: any[]): void {
     }
   });
   fs.appendFile(
-    `${logsFolder}/${startDateISO}.txt`,
+    `${logsFolder}/${fileName}.txt`,
     timestampedMessage + "\n",
     (err) => {
       if (err) {
