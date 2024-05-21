@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { consoleLog } from "@/utils";
+import { PuppeteerLaunchOptions } from "puppeteer";
 
 puppeteer.use(StealthPlugin());
 
@@ -8,7 +9,7 @@ const puppeteerTimeout = 60000;
 
 export async function setupPuppeteer() {
   consoleLog("Setting up puppeteer...");
-  let options: Record<string, any> = {
+  let options: PuppeteerLaunchOptions = {
     headless: true,
     timeout: puppeteerTimeout,
     defaultViewport: {
