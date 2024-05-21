@@ -148,7 +148,10 @@ export async function continuouslyGetEarliestDate({
       });
     }
 
-    consoleLog("🟢 Found an earlier date:", firstAvailableDate);
+    consoleLog(
+      "🟢 Found an earlier date:",
+      firstAvailableDate.toLocaleString(timeLocale, localeOptions)
+    );
     return {
       firstAvailableDateStr: firstAvailableDateRaw,
       firstAvailableDate,
