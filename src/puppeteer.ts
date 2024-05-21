@@ -16,7 +16,7 @@ export async function setupPuppeteer() {
       height: 1080,
     },
   };
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.IS_PROD) {
     options.args = ["--no-sandbox", "--disable-setuid-sandbox"];
   }
   const browser = await puppeteer.launch();
