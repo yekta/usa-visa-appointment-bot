@@ -25,7 +25,7 @@ export async function continuouslyGetEarliestTime({
   retryRound?: number;
 }) {
   if (retryRound >= getEarliestTimeRetryLimit) {
-    throw new Error("Reached retry limit. Exiting...");
+    return { firstAvailableTimeStr: null };
   }
   try {
     consoleLog("Fetching the first available time for:", dateStr);

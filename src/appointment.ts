@@ -71,6 +71,14 @@ export async function bookEarlierAppointment({
         csrfToken,
         dateStr: firstAvailableDateStr,
       });
+      if (!firstAvailableTimeStr) {
+        consoleLog(
+          "No available time slots coming from continuoslyGetEarliestTime. Retrying after shortDelay..."
+        );
+        await randomDelay(shortDelay, shortDelay + 10000);
+        await bookEarlierAppointment({ currentDate, maxDate, minDate });
+        return;
+      }
       const res = await book({
         csrfToken,
         cookiesString,
