@@ -1,6 +1,6 @@
 import moment from "moment-timezone";
 
-export const botVersion = "1.0.3";
+export const botVersion = "1.0.4";
 
 export const shortDelay = 60 * 1000;
 export const longDelay = 15 * 60 * 1000;
