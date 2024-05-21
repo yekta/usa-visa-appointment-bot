@@ -20,7 +20,7 @@ export async function setupPuppeteer() {
     console.log("IS_PROD is set to true. Disabling sandbox.");
     options.args = ["--no-sandbox", "--disable-setuid-sandbox"];
   }
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
   page.setDefaultTimeout(puppeteerTimeout);
   consoleLog("Puppeteer is set up.");
