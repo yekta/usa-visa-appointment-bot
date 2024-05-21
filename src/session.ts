@@ -63,6 +63,8 @@ export async function getSession({
   }
 }
 
+const navigationDelays = [15000, 16000];
+
 export async function signIn(page: Page) {
   consoleLog("⏳ Signing in...");
 
@@ -80,7 +82,7 @@ export async function signIn(page: Page) {
     consoleLog("Closing the modal");
     await page.click(modalCloseButtonSelector);
     consoleLog("Waiting for the modal to close with a delay...");
-    await randomDelay();
+    await randomDelay(...navigationDelays);
   }
 
   consoleLog(
@@ -100,7 +102,7 @@ export async function signIn(page: Page) {
   const [] = await Promise.all([page.click(acceptPolicySelector)]);
 
   consoleLog("Waiting for delay before clicking sign in button");
-  await randomDelay();
+  await randomDelay(...navigationDelays);
 
   consoleLog("Clicking the sign in button and waiting for the  navigation");
   const [] = await Promise.all([
