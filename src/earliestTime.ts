@@ -24,9 +24,13 @@ export async function getEarliestTimeWithRetry({
   csrfToken: string;
   dateStr: string;
   retryRound?: number;
-}) {
+}): Promise<{
+  firstAvailableTimeStr: string | null;
+  csrfToken: string;
+  cookiesString: string;
+}> {
   if (retryRound >= getEarliestTimeRetryLimit) {
-    return { firstAvailableTimeStr: null };
+    return { firstAvailableTimeStr: null, csrfToken, cookiesString };
   }
   try {
     consoleLog("Fetching the first available time for:", dateStr);
@@ -108,7 +112,7 @@ export async function getEarliestTimeWithRetry({
       dateStr
     );
 
-    return { firstAvailableTimeStr };
+    return { firstAvailableTimeStr, csrfToken, cookiesString };
   } catch (error) {
     consoleLog("GetTime error:", error);
     await randomDelayAfterError();

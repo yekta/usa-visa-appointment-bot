@@ -31,7 +31,12 @@ export async function continuouslyGetEarliestDate({
   csrfToken: string;
   currentDate: Date;
   minDate: Date;
-}) {
+}): Promise<{
+  firstAvailableDateStr: string;
+  firstAvailableDate: Date;
+  csrfToken: string;
+  cookiesString: string;
+}> {
   try {
     const processStartDate = new Date();
     consoleLog("Fetching the first available date...");
@@ -144,7 +149,12 @@ export async function continuouslyGetEarliestDate({
     }
 
     consoleLog("🟢 Found an earlier date:", firstAvailableDate);
-    return { firstAvailableDateStr: firstAvailableDateRaw, firstAvailableDate };
+    return {
+      firstAvailableDateStr: firstAvailableDateRaw,
+      firstAvailableDate,
+      csrfToken,
+      cookiesString,
+    };
   } catch (error) {
     consoleLog("GetDate error:", error);
     consoleLog(

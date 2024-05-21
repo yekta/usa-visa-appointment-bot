@@ -42,14 +42,18 @@ export async function bookEarlierAppointment({
     const page = await setupPuppeteer();
     const { csrfToken, cookiesString } = await getSession({ page });
 
-    const { firstAvailableDate, firstAvailableDateStr } =
-      await continuouslyGetEarliestDate({
-        page,
-        cookiesString,
-        csrfToken,
-        currentDate,
-        minDate,
-      });
+    const {
+      firstAvailableDate,
+      firstAvailableDateStr,
+      csrfToken: csrfToken2,
+      cookiesString: cookiesString2,
+    } = await continuouslyGetEarliestDate({
+      page,
+      cookiesString,
+      csrfToken,
+      currentDate,
+      minDate,
+    });
 
     sendDiscordNotification({
       currentAppointmentDate: currentDate,
@@ -65,12 +69,17 @@ export async function bookEarlierAppointment({
       firstAvailableDate <= maxDate
     ) {
       consoleLog("Can book this appointment date:", firstAvailableDateStr);
-      const { firstAvailableTimeStr } = await getEarliestTimeWithRetry({
+      const {
+        firstAvailableTimeStr,
+        csrfToken: csrfToken3,
+        cookiesString: cookiesString3,
+      } = await getEarliestTimeWithRetry({
         page,
-        cookiesString,
-        csrfToken,
+        cookiesString: cookiesString2,
+        csrfToken: csrfToken2,
         dateStr: firstAvailableDateStr,
       });
+
       if (!firstAvailableTimeStr) {
         consoleLog(
           "No available time slots coming from continuoslyGetEarliestTime. Retrying after shortDelay..."
@@ -79,9 +88,10 @@ export async function bookEarlierAppointment({
         await bookEarlierAppointment({ currentDate, maxDate, minDate });
         return;
       }
+
       const res = await book({
-        csrfToken,
-        cookiesString,
+        csrfToken: csrfToken3,
+        cookiesString: cookiesString3,
         dateStr: firstAvailableDateStr,
         timeStr: firstAvailableTimeStr,
       });
