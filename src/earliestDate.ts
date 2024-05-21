@@ -17,13 +17,11 @@ import moment from "moment-timezone";
 import { Page } from "puppeteer";
 
 export async function continuouslyGetEarliestDate({
-  page,
   cookiesString,
   csrfToken,
   currentDate,
   minDate,
 }: {
-  page: Page;
   cookiesString: string;
   csrfToken: string;
   currentDate: Date;
@@ -53,7 +51,6 @@ export async function continuouslyGetEarliestDate({
       consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelayAfterError();
       return await continuouslyGetEarliestDate({
-        page,
         cookiesString,
         csrfToken,
         currentDate,
@@ -65,12 +62,8 @@ export async function continuouslyGetEarliestDate({
       consoleLog(`${res.status} status code.`);
       consoleLog("🔐 Doesn't seem to be signed in, signing in after delay...");
       await randomDelayAfterError();
-      const { cookiesString: coStr, csrfToken: csStr } = await getSession({
-        page,
-        reload: true,
-      });
+      const { cookiesString: coStr, csrfToken: csStr } = await getSession();
       return await continuouslyGetEarliestDate({
-        page,
         cookiesString: coStr,
         csrfToken: csStr,
         currentDate,
@@ -84,7 +77,6 @@ export async function continuouslyGetEarliestDate({
       consoleLog("No available dates found. Checking again after delay...");
       await randomDelay();
       return await continuouslyGetEarliestDate({
-        page,
         cookiesString,
         csrfToken,
         currentDate,
@@ -132,7 +124,6 @@ export async function continuouslyGetEarliestDate({
       consoleLog("Checking the availability after delay...");
       await randomDelay();
       return await continuouslyGetEarliestDate({
-        page,
         cookiesString,
         csrfToken,
         currentDate,
@@ -151,7 +142,6 @@ export async function continuouslyGetEarliestDate({
     );
     await randomDelay(longDelay, longDelay + 1000);
     return await continuouslyGetEarliestDate({
-      page,
       cookiesString,
       csrfToken,
       currentDate,

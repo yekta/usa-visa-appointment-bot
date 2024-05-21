@@ -1,55 +1,43 @@
 import {
   email,
-  password,
-  appointmentUrl,
-  signInUrl,
+  host,
+  hostUrl,
   longDelay,
+  password,
+  sharedHeaders,
+  signInUrl,
 } from "@/constants";
-import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils";
+import { consoleLog, randomDelay } from "@/utils";
+import { load } from "cheerio";
 import { Page } from "puppeteer";
 
-export async function getSession({
-  page,
-  reload = false,
-}: {
-  page: Page;
-  reload?: boolean;
-}) {
+export async function getSession() {
   consoleLog("getSession function called");
   try {
-    if (reload) {
-      await page.reload();
-    }
-    if (page.url() !== appointmentUrl) {
-      consoleLog("Navigating to the appointment page...");
-      await page.goto(appointmentUrl);
-      consoleLog("Current url is:", page.url());
-    }
-    if (page.url() === signInUrl) {
-      consoleLog("Url is still the sign in page.");
-      await signIn(page);
-      if (page.url() != appointmentUrl) {
-        consoleLog("Signing in failed. Retrying...");
-        return await getSession({ page: page });
-      }
-    }
-    const csrfToken = await page.$eval('meta[name="csrf-token"]', (element) =>
-      element.getAttribute("content")
-    );
-    if (!csrfToken) {
-      consoleLog("CSRF token is not found. Retrying after delay...");
-      await randomDelayAfterError();
-      return await getSession({ page });
-    }
-    consoleLog("CSRF token is:" + csrfToken);
+    const res = await fetch(signInUrl, {
+      headers: {
+        Host: host,
+        Referer: hostUrl,
+        ...sharedHeaders,
+      },
+    });
+    const resText = await res.text();
+    const resHeaders = res.headers;
 
-    const cookies = await page.cookies();
-    const cookiesString = cookies
+    const $ = load(resText);
+    const initialCsrfToken = $('meta[name="csrf-token"]').attr("content");
+    if (initialCsrfToken === undefined) {
+      throw new Error("CSRF token not found");
+    }
+
+    const initialCookiesObj = parseCookies(resHeaders.get("set-cookie"));
+    const initialCookiesString = initialCookiesObj
       .map((cookie) => `${cookie.name}=${cookie.value}`)
       .join("; ");
-    consoleLog("Cookies are:" + cookiesString);
+    consoleLog("Initial CSRF token is:" + initialCsrfToken);
+    consoleLog("Initial Cookie string:" + initialCookiesString);
 
-    return { csrfToken, cookiesString };
+    return { csrfToken: "", cookiesString: "" };
   } catch (error) {
     consoleLog("getSession error:", error);
     consoleLog(
@@ -58,7 +46,7 @@ export async function getSession({
       )} minutes...`
     );
     await randomDelay(longDelay, longDelay + 1000);
-    return await getSession({ page });
+    return await getSession();
   }
 }
 
@@ -110,3 +98,20 @@ export async function signIn(page: Page) {
   consoleLog("✅ Signed in successfully.");
   consoleLog("Url after sign in is: " + page.url());
 }
+
+type TCookie = { name: string; value: string };
+
+const parseCookies = (rawCookies: string | null): TCookie[] => {
+  if (!rawCookies) {
+    return [];
+  }
+  const cookies: { name: string; value: string }[] = [];
+  const cookiePairs = rawCookies.split(",").map((cookie) => cookie.trim());
+  cookiePairs.forEach((header) => {
+    const parts = header.split(";")[0].split("=");
+    const name = parts[0].trim();
+    const value = parts[1].trim();
+    cookies.push({ name, value });
+  });
+  return cookies;
+};

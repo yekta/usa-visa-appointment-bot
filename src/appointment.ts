@@ -1,16 +1,14 @@
-import type { Page } from "puppeteer";
-import { consoleLog, randomDelay } from "@/utils.ts";
-import fs from "fs";
-import { setupPuppeteer } from "@/puppeteer";
 import { book } from "@/book";
-import { getSession } from "@/session";
-import { continuouslyGetEarliestDate } from "@/earliestDate";
-import { continuouslyGetEarliestTime } from "@/earliestTime";
+import { facilityId, longDelay, shortDelay, timeZone } from "@/constants";
 import {
   sendAppointmentBookedDiscordNotification,
   sendDiscordNotification,
 } from "@/discord";
-import { facilityId, longDelay, shortDelay, timeZone } from "@/constants";
+import { continuouslyGetEarliestDate } from "@/earliestDate";
+import { continuouslyGetEarliestTime } from "@/earliestTime";
+import { getSession } from "@/session";
+import { consoleLog, randomDelay } from "@/utils.ts";
+import fs from "fs";
 import moment from "moment-timezone";
 
 const screenshotsDir = "screenshots";
@@ -39,12 +37,11 @@ export async function bookEarlierAppointment({
   );
   try {
     const processStartDate = new Date();
-    const page = await setupPuppeteer();
-    const { csrfToken, cookiesString } = await getSession({ page });
+    const { csrfToken, cookiesString } = await getSession();
+    return;
 
     const { firstAvailableDate, firstAvailableDateStr } =
       await continuouslyGetEarliestDate({
-        page,
         cookiesString,
         csrfToken,
         currentDate,
@@ -66,7 +63,6 @@ export async function bookEarlierAppointment({
     ) {
       consoleLog("Can book this appointment date:", firstAvailableDateStr);
       const { firstAvailableTimeStr } = await continuouslyGetEarliestTime({
-        page,
         cookiesString,
         csrfToken,
         dateStr: firstAvailableDateStr,

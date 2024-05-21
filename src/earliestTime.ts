@@ -12,13 +12,11 @@ import type { Page } from "puppeteer";
 const getEarliestTimeRetryLimit = 3;
 
 export async function continuouslyGetEarliestTime({
-  page,
   cookiesString,
   csrfToken,
   dateStr,
   retryRound = 0,
 }: {
-  page: Page;
   cookiesString: string;
   csrfToken: string;
   dateStr: string;
@@ -51,12 +49,8 @@ export async function continuouslyGetEarliestTime({
       consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelay(3000, 4000);
       consoleLog("Doesn't seem to be signed in, getting session...");
-      const { cookiesString: coStr, csrfToken: csStr } = await getSession({
-        page,
-        reload: true,
-      });
+      const { cookiesString: coStr, csrfToken: csStr } = await getSession();
       return await continuouslyGetEarliestTime({
-        page,
         cookiesString: coStr,
         csrfToken: csStr,
         dateStr,
@@ -68,7 +62,6 @@ export async function continuouslyGetEarliestTime({
       consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelay(3000, 4000);
       return await continuouslyGetEarliestTime({
-        page,
         cookiesString,
         csrfToken,
         dateStr,
@@ -90,7 +83,6 @@ export async function continuouslyGetEarliestTime({
       consoleLog("No available time slots found. Retrying...");
       await randomDelay(3000, 4000);
       return await continuouslyGetEarliestTime({
-        page,
         cookiesString,
         csrfToken,
         dateStr,
@@ -112,7 +104,6 @@ export async function continuouslyGetEarliestTime({
     consoleLog("GetTime error:", error);
     await randomDelayAfterError();
     return await continuouslyGetEarliestTime({
-      page,
       cookiesString,
       csrfToken,
       dateStr,
