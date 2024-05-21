@@ -5,7 +5,7 @@ import { setupPuppeteer } from "@/puppeteer";
 import { book } from "@/book";
 import { getSession } from "@/session";
 import { continuouslyGetEarliestDate } from "@/earliestDate";
-import { continuouslyGetEarliestTime } from "@/earliestTime";
+import { getEarliestTimeWithRetry } from "@/earliestTime";
 import {
   sendAppointmentBookedDiscordNotification,
   sendDiscordNotification,
@@ -65,7 +65,7 @@ export async function bookEarlierAppointment({
       firstAvailableDate <= maxDate
     ) {
       consoleLog("Can book this appointment date:", firstAvailableDateStr);
-      const { firstAvailableTimeStr } = await continuouslyGetEarliestTime({
+      const { firstAvailableTimeStr } = await getEarliestTimeWithRetry({
         page,
         cookiesString,
         csrfToken,

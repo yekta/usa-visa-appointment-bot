@@ -11,7 +11,7 @@ import type { Page } from "puppeteer";
 
 const getEarliestTimeRetryLimit = 3;
 
-export async function continuouslyGetEarliestTime({
+export async function getEarliestTimeWithRetry({
   page,
   cookiesString,
   csrfToken,
@@ -55,7 +55,7 @@ export async function continuouslyGetEarliestTime({
         page,
         reload: true,
       });
-      return await continuouslyGetEarliestTime({
+      return await getEarliestTimeWithRetry({
         page,
         cookiesString: coStr,
         csrfToken: csStr,
@@ -67,7 +67,7 @@ export async function continuouslyGetEarliestTime({
     if (res.status >= 500 && res.status < 600) {
       consoleLog(`${res.status} status code. Waiting delay and retrying...`);
       await randomDelay(3000, 4000);
-      return await continuouslyGetEarliestTime({
+      return await getEarliestTimeWithRetry({
         page,
         cookiesString,
         csrfToken,
@@ -89,7 +89,7 @@ export async function continuouslyGetEarliestTime({
     if (combinedArray.length === 0) {
       consoleLog("No available time slots found. Retrying...");
       await randomDelay(3000, 4000);
-      return await continuouslyGetEarliestTime({
+      return await getEarliestTimeWithRetry({
         page,
         cookiesString,
         csrfToken,
@@ -111,7 +111,7 @@ export async function continuouslyGetEarliestTime({
   } catch (error) {
     consoleLog("GetTime error:", error);
     await randomDelayAfterError();
-    return await continuouslyGetEarliestTime({
+    return await getEarliestTimeWithRetry({
       page,
       cookiesString,
       csrfToken,
