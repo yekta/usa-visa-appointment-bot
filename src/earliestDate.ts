@@ -17,6 +17,8 @@ import { consoleLog } from "@/utils";
 import moment from "moment-timezone";
 import { Page } from "puppeteer";
 
+const earliestDatePullDelays = [10000, 11000];
+
 export async function continuouslyGetEarliestDate({
   page,
   cookiesString,
@@ -83,7 +85,7 @@ export async function continuouslyGetEarliestDate({
 
     if (resJson.length === 0) {
       consoleLog("No available dates found. Checking again after delay...");
-      await randomDelay();
+      await randomDelay(...earliestDatePullDelays);
       return await continuouslyGetEarliestDate({
         page,
         cookiesString,
@@ -131,7 +133,7 @@ export async function continuouslyGetEarliestDate({
         });
       }
       consoleLog("Checking the availability after delay...");
-      await randomDelay();
+      await randomDelay(...earliestDatePullDelays);
       return await continuouslyGetEarliestDate({
         page,
         cookiesString,

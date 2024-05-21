@@ -5,8 +5,9 @@ import {
   sharedHeaders,
   userAgent,
 } from "@/constants";
+import { randomDelay, randomDelayAfterError } from "@/delay";
 import { getSession } from "@/session";
-import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils.ts";
+import { consoleLog } from "@/utils.ts";
 import type { Page } from "puppeteer";
 
 const getEarliestTimeRetryLimit = 3;
