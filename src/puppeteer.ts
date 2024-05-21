@@ -17,6 +17,7 @@ export async function setupPuppeteer() {
     },
   };
   if (process.env.IS_PROD) {
+    console.log("IS_PROD is set to true. Disabling sandbox.");
     options.args = ["--no-sandbox", "--disable-setuid-sandbox"];
   }
   const browser = await puppeteer.launch();
