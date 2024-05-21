@@ -1,5 +1,4 @@
-import type { Page } from "puppeteer";
-import { consoleLog, randomDelay } from "@/utils.ts";
+import { consoleLog } from "@/utils.ts";
 import fs from "fs";
 import { setupPuppeteer } from "@/puppeteer";
 import { book } from "@/book";
@@ -12,6 +11,7 @@ import {
 } from "@/discord";
 import { facilityId, longDelay, shortDelay, timeZone } from "@/constants";
 import moment from "moment-timezone";
+import { randomDelay } from "@/delay";
 
 const screenshotsDir = "screenshots";
 if (!fs.existsSync(screenshotsDir)) {

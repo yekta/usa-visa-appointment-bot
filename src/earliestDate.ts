@@ -10,9 +10,10 @@ import {
   timeZone,
   userAgent,
 } from "@/constants";
+import { randomDelay, randomDelayAfterError } from "@/delay";
 import { sendDiscordNotification } from "@/discord";
 import { getSession } from "@/session";
-import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils";
+import { consoleLog } from "@/utils";
 import moment from "moment-timezone";
 import { Page } from "puppeteer";
 
