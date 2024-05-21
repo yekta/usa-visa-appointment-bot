@@ -36,6 +36,7 @@ export async function bookEarlierAppointment({
     " /// ",
     "Minimum Appointment Date:",
     minDate,
+    " /// ",
     "Facility ID:",
     facilityId
   );
