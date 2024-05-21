@@ -5,7 +5,8 @@ import {
   signInUrl,
   longDelay,
 } from "@/constants";
-import { consoleLog, randomDelay, randomDelayAfterError } from "@/utils";
+import { randomDelay, randomDelayAfterError } from "@/delay";
+import { consoleLog } from "@/utils";
 import { Page } from "puppeteer";
 
 export async function getSession({
