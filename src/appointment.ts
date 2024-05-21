@@ -35,7 +35,9 @@ export async function bookEarlierAppointment({
     maxDate,
     " /// ",
     "Minimum Appointment Date:",
-    minDate
+    minDate,
+    "Facility ID:",
+    facilityId
   );
   try {
     const processStartDate = new Date();
