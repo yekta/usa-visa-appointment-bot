@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { bookEarlierAppointment } from "@/appointment.ts";
 import {
+  botVersion,
   currentAppointmentDate,
   maxAppointmentDate,
   minAppointmentDate,
@@ -16,7 +17,7 @@ app.get("/health", (req, res) => {
   res.send("ok");
 });
 
-consoleLog("Version is: 1.0.1");
+consoleLog(`Bot version: ${botVersion}`);
 
 bookEarlierAppointment({
   currentDate: currentAppointmentDate,
