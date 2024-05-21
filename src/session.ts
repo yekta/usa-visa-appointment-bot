@@ -5,6 +5,7 @@ import {
   longDelay,
   password,
   sharedHeaders,
+  signInCommitButtonText,
   signInUrl,
 } from "@/constants";
 import { consoleLog, randomDelay } from "@/utils";
@@ -14,30 +15,66 @@ import { Page } from "puppeteer";
 export async function getSession() {
   consoleLog("getSession function called");
   try {
-    const res = await fetch(signInUrl, {
+    const initialRes = await fetch(signInUrl, {
       headers: {
         Host: host,
         Referer: hostUrl,
         ...sharedHeaders,
       },
     });
-    const resText = await res.text();
-    const resHeaders = res.headers;
+    const initialResText = await initialRes.text();
+    const initialSetCookieHeader = initialRes.headers.get("set-cookie");
 
-    const $ = load(resText);
-    const initialCsrfToken = $('meta[name="csrf-token"]').attr("content");
-    if (initialCsrfToken === undefined) {
-      throw new Error("CSRF token not found");
+    const csrfToken = parseCsrfToken(initialResText);
+    const initialCookiesString = parseCookies(initialSetCookieHeader);
+
+    if (!csrfToken) {
+      consoleLog(
+        "No csrfToken after anonymous call. Midly risky error detected! Retrying after 1 minute..."
+      );
+      await randomDelay(60000, 61000);
+      return await getSession();
     }
 
-    const initialCookiesObj = parseCookies(resHeaders.get("set-cookie"));
-    const initialCookiesString = initialCookiesObj
-      .map((cookie) => `${cookie.name}=${cookie.value}`)
-      .join("; ");
-    consoleLog("Initial CSRF token is:" + initialCsrfToken);
-    consoleLog("Initial Cookie string:" + initialCookiesString);
+    if (!initialCookiesString) {
+      consoleLog(
+        "No initialCookiesString after anonymous call. Midly risky error detected! Retrying after 1 minute..."
+      );
+      await randomDelay(60000, 61000);
+      return await getSession();
+    }
 
-    return { csrfToken: "", cookiesString: "" };
+    const res = await fetch(signInUrl, {
+      headers: {
+        Host: host,
+        Referer: signInUrl,
+        Cookie: initialCookiesString,
+        "X-Csrf-Token": csrfToken,
+        "Content-Type": "application/x-www-form-urlencoded",
+        ...sharedHeaders,
+      },
+      method: "POST",
+      body: new URLSearchParams({
+        utf8: "✓",
+        "user[email]": email,
+        "user[password]": password,
+        policy_confirmed: "1",
+        commit: signInCommitButtonText,
+      }),
+    });
+
+    const resHeaders = res.headers.get("set-cookie");
+    const cookiesString = parseCookies(resHeaders);
+
+    if (!cookiesString) {
+      consoleLog(
+        "No cookiesString after trying to sign in. Midly risky error detected! Retrying after 1 minute..."
+      );
+      await randomDelay(60000, 61000);
+      return await getSession();
+    }
+
+    return { csrfToken, cookiesString };
   } catch (error) {
     consoleLog("getSession error:", error);
     consoleLog(
@@ -99,11 +136,9 @@ export async function signIn(page: Page) {
   consoleLog("Url after sign in is: " + page.url());
 }
 
-type TCookie = { name: string; value: string };
-
-const parseCookies = (rawCookies: string | null): TCookie[] => {
+const parseCookies = (rawCookies: string | null): string | null => {
   if (!rawCookies) {
-    return [];
+    return null;
   }
   const cookies: { name: string; value: string }[] = [];
   const cookiePairs = rawCookies.split(",").map((cookie) => cookie.trim());
@@ -113,5 +148,14 @@ const parseCookies = (rawCookies: string | null): TCookie[] => {
     const value = parts[1].trim();
     cookies.push({ name, value });
   });
-  return cookies;
+  const cookiesString = cookies
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+  return cookiesString;
+};
+
+const parseCsrfToken = (html: string): string | null => {
+  const $ = load(html);
+  const csrf = $('meta[name="csrf-token"]').attr("content");
+  return csrf ? csrf : null;
 };

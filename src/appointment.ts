@@ -38,7 +38,9 @@ export async function bookEarlierAppointment({
   try {
     const processStartDate = new Date();
     const { csrfToken, cookiesString } = await getSession();
-    return;
+
+    consoleLog("CsrfToken:", csrfToken);
+    consoleLog("CookiesString:", cookiesString);
 
     const { firstAvailableDate, firstAvailableDateStr } =
       await continuouslyGetEarliestDate({

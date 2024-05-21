@@ -42,10 +42,19 @@ export const password = process.env.PASSWORD || "";
 export const scheduleId = process.env.SCHEDULE_ID || "";
 export const facilityId = process.env.FACILITY_ID || "";
 export const countryCode = process.env.COUNTRY_CODE || "";
+export const signInCommitButtonText =
+  process.env.SIGN_IN_COMMIT_BUTTON_TEXT || "";
 
-if (!email || !password || !scheduleId || !facilityId || !countryCode) {
+if (
+  !email ||
+  !password ||
+  !scheduleId ||
+  !facilityId ||
+  !countryCode ||
+  !signInCommitButtonText
+) {
   throw new Error(
-    "Please provide all the required environment variables: EMAIL, PASSWORD, SCHEDULE_ID, FACILITY_ID, COUNTRY_CODE"
+    "Please provide all the required environment variables: EMAIL, PASSWORD, SCHEDULE_ID, FACILITY_ID, COUNTRY_CODE, SIGN_IN_COMMIT_BUTTON_TEXT"
   );
 }
 
@@ -71,4 +80,5 @@ export const sharedHeaders = {
   "Sec-Fetch-Dest": "empty",
   "Sec-Fetch-Mode": "cors",
   "Sec-Fetch-Site": "same-origin",
+  redirect: "follow",
 };
