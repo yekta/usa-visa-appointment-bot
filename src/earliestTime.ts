@@ -1,7 +1,7 @@
 import {
   appointmentUrl,
   getAppointmentTimesUrl,
-  host,
+  visaHost,
   sharedHeaders,
   userAgent,
 } from "@/constants";
@@ -37,7 +37,7 @@ export async function getEarliestTimeWithRetry({
     const res = await fetch(getAppointmentTimesUrl(dateStr), {
       method: "GET",
       headers: {
-        Host: host,
+        Host: visaHost,
         Referer: appointmentUrl,
         "Accept-Encoding": "gzip, deflate, br",
         Connection: "keep-alive",

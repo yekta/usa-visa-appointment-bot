@@ -1,6 +1,6 @@
 import {
   facilityId,
-  host,
+  visaHost,
   appointmentUrl,
   userAgent,
   sharedHeaders,
@@ -17,7 +17,7 @@ interface TRescheduleProps {
 export async function book(props: TRescheduleProps) {
   consoleLog(`Booking appointment for: ${props.dateStr} ${props.timeStr}...`);
   let headers = {
-    Host: host,
+    Host: visaHost,
     "User-Agent": userAgent,
     Cookie: props.cookiesString,
     Referer: appointmentUrl,

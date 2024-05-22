@@ -51,8 +51,8 @@ if (!email || !password || !scheduleId || !facilityId || !countryCode) {
   );
 }
 
-export const host = "ais.usvisa-info.com";
-const baseUrl = `https://${host}/${countryCode}/niv`;
+export const visaHost = "ais.usvisa-info.com";
+const baseUrl = `https://${visaHost}/${countryCode}/niv`;
 export const signInUrl = `${baseUrl}/users/sign_in`;
 export const appointmentUrl = `${baseUrl}/schedule/${scheduleId}/appointment`;
 export const appointmentDatesUrl =

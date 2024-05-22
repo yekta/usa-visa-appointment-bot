@@ -2,7 +2,7 @@ import {
   appointmentDatesUrl,
   appointmentUrl,
   facilityId,
-  host,
+  visaHost,
   localeOptions,
   longDelay,
   sharedHeaders,
@@ -40,11 +40,10 @@ export async function continuouslyGetEarliestDate({
   try {
     const processStartDate = new Date();
     consoleLog("Fetching the first available date...");
-    console.log("HOST IS:", host);
     const res = await fetch(appointmentDatesUrl, {
       method: "GET",
       headers: {
-        Host: host,
+        Host: visaHost,
         Referer: appointmentUrl,
         "Accept-Encoding": "gzip, deflate, br",
         Connection: "keep-alive",
