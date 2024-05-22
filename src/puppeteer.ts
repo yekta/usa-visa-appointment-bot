@@ -33,6 +33,8 @@ export async function setupPuppeteer() {
   }
   const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
+  const version = await browser.version();
+  consoleLog(`Puppeteer version: ${version}`);
   page.setDefaultTimeout(puppeteerTimeout);
   consoleLog("Puppeteer is set up.");
   return page;
