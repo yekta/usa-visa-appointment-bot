@@ -17,7 +17,7 @@ export async function setupPuppeteer() {
       height: 1080,
     },
   };
-  if (process.env.IS_PROD) {
+  if (process.env.IS_PROD || process.env.NODE_ENV === "production") {
     console.log("IS_PROD is set to true. Disabling sandbox.");
     options.args = [
       "--no-sandbox",
