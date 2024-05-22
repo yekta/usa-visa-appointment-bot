@@ -18,7 +18,7 @@ export async function setupPuppeteer() {
     },
   };
   if (process.env.IS_PROD || process.env.NODE_ENV === "production") {
-    console.log("IS_PROD is set to true. Disabling sandbox.");
+    consoleLog("Production is set to true. Disabling sandbox.");
     options.args = [
       "--no-sandbox",
       "--disable-setuid-sandbox",
