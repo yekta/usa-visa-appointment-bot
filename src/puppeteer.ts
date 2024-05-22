@@ -29,6 +29,7 @@ export async function setupPuppeteer() {
       "--disable-features=IsolateOrigins,site-per-process",
       "--disable-blink-features=AutomationControlled",
     ];
+    options.executablePath = "/usr/bin/google-chrome";
   }
   const browser = await puppeteer.launch(options);
   const page = await browser.newPage();
