@@ -40,6 +40,7 @@ export async function continuouslyGetEarliestDate({
   try {
     const processStartDate = new Date();
     consoleLog("Fetching the first available date...");
+    console.log("HOST IS:", host);
     const res = await fetch(appointmentDatesUrl, {
       method: "GET",
       headers: {
@@ -47,7 +48,7 @@ export async function continuouslyGetEarliestDate({
         Referer: appointmentUrl,
         "Accept-Encoding": "gzip, deflate, br",
         Connection: "keep-alive",
-        Accept: "application/json, text/javascript, */*; q=0.01",
+        Accept: "*/*",
         "X-Csrf-Token": csrfToken,
         "X-Requested-With": "XMLHttpRequest",
         Cookie: cookiesString,
