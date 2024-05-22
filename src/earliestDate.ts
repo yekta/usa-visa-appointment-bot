@@ -86,9 +86,7 @@ export async function continuouslyGetEarliestDate({
       });
     }
 
-    const resText = await res.text();
-    consoleLog("EARLIEST DATE RES:", resText);
-    const resJson = JSON.parse(resText);
+    const resJson = await res.json();
 
     if (resJson.length === 0) {
       consoleLog("No available dates found. Checking again after delay...");
