@@ -41,7 +41,7 @@ export async function getEarliestTimeWithRetry({
         Referer: appointmentUrl,
         "Accept-Encoding": "gzip, deflate, br",
         Connection: "keep-alive",
-        Accept: "*/*",
+        Accept: "application/json, text/javascript, */*; q=0.01",
         "X-Csrf-Token": csrfToken,
         "X-Requested-With": "XMLHttpRequest",
         Cookie: cookiesString,
