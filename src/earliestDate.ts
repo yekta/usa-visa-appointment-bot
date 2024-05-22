@@ -17,7 +17,7 @@ import { consoleLog } from "@/utils";
 import moment from "moment-timezone";
 import { Page } from "puppeteer";
 
-const earliestDatePullDelays = [5000, 6000];
+const earliestDatePullDelays = [10000, 11000];
 
 export async function continuouslyGetEarliestDate({
   page,
