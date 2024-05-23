@@ -38,4 +38,5 @@ config.ini
 
 result.png
 screenshots/
+src/screenshots
 logs/

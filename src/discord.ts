@@ -8,26 +8,23 @@ import {
 import { consoleLog } from "@/utils";
 import { FormData } from "formdata-node";
 
-type SendMessageOptions = {
+export async function sendDiscordNotification({
+  currentAppointmentDate,
+  earliestAppointmentDate,
+  processStartDate,
+  processEndDate,
+  facilityId,
+  file,
+}: {
   currentAppointmentDate: Date | null;
   earliestAppointmentDate: Date | null;
   processStartDate: Date;
   processEndDate: Date;
   facilityId: string;
-};
-
-export async function sendDiscordNotification(
-  options: SendMessageOptions
-): Promise<void> {
+  file?: Buffer;
+}): Promise<void> {
   try {
     consoleLog("⏳ Sending Discord notification...");
-    const {
-      currentAppointmentDate,
-      earliestAppointmentDate,
-      processStartDate,
-      processEndDate,
-      facilityId,
-    } = options;
 
     const hasError = !currentAppointmentDate || !earliestAppointmentDate;
 
@@ -102,6 +99,11 @@ export async function sendDiscordNotification(
       })
     );
 
+    if (file) {
+      const blob = new Blob([file]);
+      formData.append("file", blob, "upload.png"); // Append file if provided
+    }
+
     const res = await fetch(webhookUrl, {
       method: "POST",
       // @ts-ignore
@@ -123,10 +125,12 @@ export async function sendAppointmentBookedDiscordNotification({
   newAppointmentDate,
   oldAppointmentDate,
   facilityId,
+  file,
 }: {
   newAppointmentDate: Date;
   oldAppointmentDate: Date;
   facilityId: string;
+  file?: File;
 }) {
   try {
     consoleLog("⏳ Sending Discord notification for booked appointment...");
@@ -169,6 +173,10 @@ export async function sendAppointmentBookedDiscordNotification({
         embeds: [embed],
       })
     );
+
+    if (file) {
+      formData.append("file", file, file.name); // Append file if provided
+    }
 
     const res = await fetch(webhookUrl, {
       method: "POST",
