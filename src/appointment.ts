@@ -19,11 +19,6 @@ import {
 import moment from "moment-timezone";
 import { randomDelay } from "@/delay";
 
-const screenshotsDir = "screenshots";
-if (!fs.existsSync(screenshotsDir)) {
-  fs.mkdirSync(screenshotsDir);
-}
-
 export async function bookEarlierAppointment({
   currentDate,
   maxDate,
