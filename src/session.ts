@@ -61,18 +61,6 @@ export async function getSession({
       .join("; ");
     consoleLog("Cookies are:" + cookiesString);
 
-    await page.screenshot({ path: "screenshots/screenshot.png" });
-    const file = fs.readFileSync("screenshots/screenshot.png");
-
-    await sendDiscordNotification({
-      currentAppointmentDate: new Date(),
-      earliestAppointmentDate: new Date(),
-      facilityId: facilityId,
-      processEndDate: new Date(),
-      processStartDate: new Date(),
-      file,
-    });
-
     return { csrfToken, cookiesString };
   } catch (error) {
     consoleLog("getSession error:", error);
