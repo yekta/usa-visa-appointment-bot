@@ -17,20 +17,8 @@ export function consoleLog(...args: any[]): void {
     .join(" ");
   const timestampedMessage = `${currentDate} | ${message}`;
   console.log(timestampedMessage);
-  fs.mkdir(logsFolder, { recursive: true }, (err) => {
-    if (err) {
-      console.error("Failed to create logs folder:", err);
-    }
-  });
-  fs.appendFile(
-    `${logsFolder}/${fileName}.txt`,
-    timestampedMessage + "\n",
-    (err) => {
-      if (err) {
-        console.error("Failed to write to file:", err);
-      }
-    }
-  );
+  fs.mkdirSync(logsFolder, { recursive: true });
+  fs.appendFileSync(`${logsFolder}/${fileName}.txt`, timestampedMessage + "\n");
 }
 
 function formatDate(date: Date, options?: { fileNameSafe: boolean }): string {
