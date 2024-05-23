@@ -75,6 +75,6 @@ export const sharedHeaders = {
   "Sec-Fetch-Site": "same-origin",
   "Accept-Language": "en-US,en;q=0.9,tr-TR;q=0.8,tr;q=0.7",
   Connection: "keep-alive",
-  "User Agent": userAgent,
+  "User-Agent": userAgent,
   "If-None-Match": `W/"96a198de0e7fb3a48efd7a39c86d7f8c"`,
 };
