@@ -8,6 +8,8 @@ const fileName = formatDate(processStartDate, {
   fileNameSafe: true,
 });
 
+//
+
 export function consoleLog(...args: any[]): void {
   const currentDate = formatDate(new Date());
   const message = args
