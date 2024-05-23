@@ -12,6 +12,8 @@ import { Page } from "puppeteer";
 import fs from "fs";
 import { sendDiscordNotification } from "@/discord";
 
+const navigationDelays = [15000, 16000];
+
 export async function getSession({
   page,
   reload = false,
@@ -37,6 +39,12 @@ export async function getSession({
         return await getSession({ page: page });
       }
     }
+
+    consoleLog(
+      "Waiting for randomDelay before extracting CSRF token and cookies..."
+    );
+    await randomDelay(...navigationDelays);
+
     const csrfToken = await page.$eval('meta[name="csrf-token"]', (element) =>
       element.getAttribute("content")
     );
@@ -77,8 +85,6 @@ export async function getSession({
     return await getSession({ page });
   }
 }
-
-const navigationDelays = [15000, 16000];
 
 export async function signIn(page: Page) {
   consoleLog("⏳ Signing in...");
