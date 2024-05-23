@@ -67,9 +67,14 @@ export const userAgent =
 export const processStartDate = new Date();
 
 export const sharedHeaders = {
-  "Sec-Ch-Ua": `"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"`,
-  "Sec-Ch-Ua-Mobile": "?0",
+  "sec-ch-ua": `"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"`,
+  "sec-ch-ua-mobile": "?0",
+  "sec-ch-ua-platform": `"macOS"`,
   "Sec-Fetch-Dest": "empty",
   "Sec-Fetch-Mode": "cors",
   "Sec-Fetch-Site": "same-origin",
+  "Accept-Language": "en-US,en;q=0.9,tr-TR;q=0.8,tr;q=0.7",
+  Connection: "keep-alive",
+  "User Agent": userAgent,
+  "If-None-Match": `W/"96a198de0e7fb3a48efd7a39c86d7f8c"`,
 };

@@ -44,13 +44,11 @@ export async function continuouslyGetEarliestDate({
     const headers = {
       Host: visaHost,
       Referer: appointmentUrl,
+      Accept: "application/json, text/javascript, */*; q=0.01",
       "Accept-Encoding": "gzip, deflate, br",
-      Connection: "keep-alive",
-      Accept: "*/*",
-      "X-Csrf-Token": csrfToken,
       "X-Requested-With": "XMLHttpRequest",
+      "X-CSRF-Token": csrfToken,
       Cookie: cookiesString,
-      "User-Agent": userAgent,
       ...sharedHeaders,
     };
     consoleLog("Headers for earliest date:", headers);

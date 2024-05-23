@@ -39,13 +39,11 @@ export async function getEarliestTimeWithRetry({
       headers: {
         Host: visaHost,
         Referer: appointmentUrl,
-        "Accept-Encoding": "gzip, deflate, br",
-        Connection: "keep-alive",
         Accept: "*/*",
-        "X-Csrf-Token": csrfToken,
+        "Accept-Encoding": "gzip, deflate, br",
         "X-Requested-With": "XMLHttpRequest",
+        "X-CSRF-Token": csrfToken,
         Cookie: cookiesString,
-        "User-Agent": userAgent,
         ...sharedHeaders,
       },
     });

@@ -18,14 +18,12 @@ export async function book(props: TRescheduleProps) {
   consoleLog(`Booking appointment for: ${props.dateStr} ${props.timeStr}...`);
   let headers = {
     Host: visaHost,
-    "User-Agent": userAgent,
     Cookie: props.cookiesString,
     Referer: appointmentUrl,
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Content-Type": "application/x-www-form-urlencoded",
     "X-CSRF-Token": props.csrfToken,
     "Cache-Control": "no-store",
-    Connection: "keep-alive",
     ...sharedHeaders,
   };
 
