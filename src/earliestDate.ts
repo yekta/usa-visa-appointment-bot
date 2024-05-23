@@ -39,6 +39,7 @@ export async function continuouslyGetEarliestDate({
 }> {
   try {
     const processStartDate = new Date();
+    consoleLog("\n---------------------------------");
     consoleLog("Fetching the first available date...");
 
     const headers = {
