@@ -40,22 +40,30 @@ export async function continuouslyGetEarliestDate({
   try {
     const processStartDate = new Date();
     consoleLog("Fetching the first available date...");
+
+    const headers = {
+      Host: visaHost,
+      Referer: appointmentUrl,
+      "Accept-Encoding": "gzip, deflate, br",
+      Connection: "keep-alive",
+      Accept: "*/*",
+      "X-Csrf-Token": csrfToken,
+      "X-Requested-With": "XMLHttpRequest",
+      Cookie: cookiesString,
+      "User-Agent": userAgent,
+      ...sharedHeaders,
+    };
+    consoleLog("Headers for earliest date:", headers);
+
     const res = await fetch(appointmentDatesUrl, {
       method: "GET",
-      headers: {
-        Host: visaHost,
-        Referer: appointmentUrl,
-        "Accept-Encoding": "gzip, deflate, br",
-        Connection: "keep-alive",
-        Accept: "*/*",
-        "X-Csrf-Token": csrfToken,
-        "X-Requested-With": "XMLHttpRequest",
-        Cookie: cookiesString,
-        "User-Agent": userAgent,
-        ...sharedHeaders,
-      },
+      headers,
     });
     consoleLog(res.status, res.statusText);
+
+    if (res.redirected) {
+      consoleLog("Redirected to:", res.url);
+    }
 
     if (res.status >= 500 && res.status < 600) {
       consoleLog(`${res.status} status code. Waiting delay and retrying...`);
