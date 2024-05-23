@@ -23,6 +23,49 @@ export async function getSession({
 }) {
   consoleLog("getSession function called");
   try {
+    page.on("request", (request) => {
+      if (!request) return;
+      if (request.headers()?.["content-type"]?.startsWith("image/")) return;
+      if (request.url()?.startsWith("data:image")) return;
+      consoleLog("Request:", {
+        url: request.url(),
+        method: request.method(),
+        headers: request.headers(),
+        postData: request.postData(),
+      });
+    });
+
+    // Event listener for responses
+    page.on("response", async (response) => {
+      if (!response) return;
+      if (response.headers()?.["content-type"]?.startsWith("image/")) return;
+      if (response.url()?.startsWith("data:image")) return;
+      const request = response.request();
+
+      let responseBody = null;
+
+      if (response.status() >= 200 && response.status() < 300) {
+        try {
+          responseBody = await response.text();
+        } catch (error) {
+          console.error("Error reading response body:", error);
+        }
+      }
+
+      consoleLog("Response:", {
+        url: response.url(),
+        status: response.status(),
+        statusText: response.statusText(),
+        headers: response.headers(),
+        request: {
+          url: request.url(),
+          method: request.method(),
+          headers: request.headers(),
+          postData: request.postData(),
+        },
+        body: responseBody,
+      });
+    });
     if (reload) {
       await page.reload();
     }
