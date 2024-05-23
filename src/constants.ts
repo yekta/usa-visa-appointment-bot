@@ -66,7 +66,7 @@ export const userAgent =
 
 export const processStartDate = new Date();
 
-export const sharedHeaders = {
+export const sharedHeaders: Record<string, string> = {
   "sec-ch-ua": `"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"`,
   "sec-ch-ua-mobile": "?0",
   "sec-ch-ua-platform": `"macOS"`,

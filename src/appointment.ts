@@ -9,7 +9,13 @@ import {
   sendAppointmentBookedDiscordNotification,
   sendDiscordNotification,
 } from "@/discord";
-import { facilityId, longDelay, shortDelay, timeZone } from "@/constants";
+import {
+  facilityId,
+  longDelay,
+  sharedHeaders,
+  shortDelay,
+  timeZone,
+} from "@/constants";
 import moment from "moment-timezone";
 import { randomDelay } from "@/delay";
 
@@ -43,6 +49,16 @@ export async function bookEarlierAppointment({
   try {
     const processStartDate = new Date();
     const page = await setupPuppeteer();
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      let headers = req.headers();
+      for (const key of Object.keys(sharedHeaders)) {
+        headers[key] = sharedHeaders[key];
+      }
+      req.continue({
+        headers,
+      });
+    });
     const { csrfToken, cookiesString } = await getSession({ page });
 
     const {

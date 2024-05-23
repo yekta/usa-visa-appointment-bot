@@ -51,7 +51,6 @@ export async function continuouslyGetEarliestDate({
       Cookie: cookiesString,
       ...sharedHeaders,
     };
-    consoleLog("Headers for earliest date:", headers);
 
     const res = await fetch(appointmentDatesUrl, {
       method: "GET",
