@@ -39,7 +39,7 @@ export async function getEarliestTimeWithRetry({
       headers: {
         Host: visaHost,
         Referer: appointmentUrl,
-        Accept: "*/*",
+        Accept: "application/json, text/javascript, */*; q=0.01",
         "Accept-Encoding": "gzip, deflate, br",
         "X-Requested-With": "XMLHttpRequest",
         "X-CSRF-Token": csrfToken,
