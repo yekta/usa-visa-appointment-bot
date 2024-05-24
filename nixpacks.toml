@@ -1,0 +1,28 @@
+[phases.setup]
+nixpkgs = [
+  "glibc",
+  "libX11",
+  "libXcomposite",
+  "libXcursor",
+  "libXdamage",
+  "libXext",
+  "libXi",
+  "libXtst",
+  "libnss",
+  "libnspr",
+  "glib",
+  "atk",
+  "pango",
+  "cups",
+  "dbus-glib",
+  "libXrandr",
+  "libXss",
+  "libasound",
+  "libatk-bridge",
+  "libdrm",
+  "libxkbcommon",
+  "freetype",
+  "fontconfig",
+  "libgbm",
+  "ca-certificates"
+]
