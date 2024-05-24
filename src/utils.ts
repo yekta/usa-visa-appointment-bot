@@ -23,7 +23,7 @@ export function consoleLog(...args: any[]): void {
 
 function formatDate(date: Date, options?: { fileNameSafe: boolean }): string {
   const newDateTz = moment(date).tz(timeZone);
-  let output = newDateTz.format("YYYY-MM-DDTHH:mm:ssZ");
+  let output = newDateTz.format("YYYY-MM-DD_HH:mm:ssZ");
   if (options?.fileNameSafe) {
     output = output.replaceAll(":", "-").replaceAll(".", "-");
   }
