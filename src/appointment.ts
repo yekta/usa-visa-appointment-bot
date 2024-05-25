@@ -32,7 +32,7 @@ export async function bookEarlierAppointment({
     "Current Appointment Date:",
     currentDate,
     " /// ",
-    "Maxiumum Appointment Date:",
+    "Maximum Appointment Date:",
     maxDate,
     " /// ",
     "Minimum Appointment Date:",
