@@ -58,11 +58,10 @@ export async function book(props: TRescheduleProps): Promise<string | null> {
 
   if (!res.ok) {
     consoleLog("Error booking appointment, retrying again immediately...");
-    const resAfterNotOkay = await book({
+    return await book({
       ...props,
       retryRound: retryRound + 1,
     });
-    return resAfterNotOkay;
   }
 
   const resText = await res.text();
