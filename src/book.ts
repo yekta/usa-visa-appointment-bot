@@ -2,7 +2,6 @@ import {
   facilityId,
   visaHost,
   appointmentUrl,
-  userAgent,
   sharedHeaders,
 } from "@/constants";
 import { consoleLog } from "@/utils";
@@ -12,9 +11,17 @@ interface TRescheduleProps {
   dateStr: string;
   timeStr: string;
   cookiesString: string;
+  retryRound?: number;
 }
 
-export async function book(props: TRescheduleProps) {
+const bookRetryLimit = 3;
+
+export async function book(props: TRescheduleProps): Promise<string | null> {
+  const { retryRound = 0 } = props;
+  if (retryRound >= bookRetryLimit) {
+    consoleLog("Reached retry limit on book(), giving up...");
+    return null;
+  }
   consoleLog(`Booking appointment for: ${props.dateStr} ${props.timeStr}...`);
   let headers = {
     Host: visaHost,
@@ -50,8 +57,12 @@ export async function book(props: TRescheduleProps) {
   consoleLog(res.status, res.statusText, res);
 
   if (!res.ok) {
-    consoleLog("Error booking appointment");
-    throw new Error("Error booking appointment");
+    consoleLog("Error booking appointment, retrying again immediately...");
+    const resAfterNotOkay = await book({
+      ...props,
+      retryRound: retryRound + 1,
+    });
+    return resAfterNotOkay;
   }
 
   const resText = await res.text();

@@ -8,7 +8,6 @@ import {
   sharedHeaders,
   timeLocale,
   timeZone,
-  userAgent,
 } from "@/constants";
 import { randomDelay, randomDelayAfterError } from "@/delay";
 import { sendDiscordNotification } from "@/discord";
@@ -17,7 +16,7 @@ import { consoleLog } from "@/utils";
 import moment from "moment-timezone";
 import { Page } from "puppeteer";
 
-const earliestDatePullDelays = [15000, 16000];
+const earliestDatePullDelays = [10000, 11000];
 
 export async function continuouslyGetEarliestDate({
   page,

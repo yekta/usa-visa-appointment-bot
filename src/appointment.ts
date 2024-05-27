@@ -1,14 +1,4 @@
-import { consoleLog } from "@/utils.ts";
-import fs from "fs";
-import { setupPuppeteer } from "@/puppeteer";
 import { book } from "@/book";
-import { getSession } from "@/session";
-import { continuouslyGetEarliestDate } from "@/earliestDate";
-import { getEarliestTimeWithRetry } from "@/earliestTime";
-import {
-  sendAppointmentBookedDiscordNotification,
-  sendDiscordNotification,
-} from "@/discord";
 import {
   facilityId,
   longDelay,
@@ -16,8 +6,17 @@ import {
   shortDelay,
   timeZone,
 } from "@/constants";
-import moment from "moment-timezone";
 import { randomDelay } from "@/delay";
+import {
+  sendAppointmentBookedDiscordNotification,
+  sendDiscordNotification,
+} from "@/discord";
+import { continuouslyGetEarliestDate } from "@/earliestDate";
+import { getEarliestTimeWithRetry } from "@/earliestTime";
+import { setupPuppeteer } from "@/puppeteer";
+import { getSession } from "@/session";
+import { consoleLog } from "@/utils.ts";
+import moment from "moment-timezone";
 
 export async function bookEarlierAppointment({
   currentDate,
@@ -109,6 +108,15 @@ export async function bookEarlierAppointment({
         dateStr: firstAvailableDateStr,
         timeStr: firstAvailableTimeStr,
       });
+
+      if (res === null) {
+        consoleLog(
+          "Booking failed, response is null. Retrying after shortDelay..."
+        );
+        await randomDelay(shortDelay, shortDelay + 10000);
+        await bookEarlierAppointment({ currentDate, maxDate, minDate });
+        return;
+      }
 
       consoleLog("🟢 Booking is completed:", res);
 
