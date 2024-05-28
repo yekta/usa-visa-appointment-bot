@@ -168,9 +168,9 @@ export async function continuouslyGetEarliestDate({
   } catch (error) {
     consoleLog("GetDate error:", error);
     consoleLog(
-      `Risky error detected! Retrying after ${Math.round(
+      `🔴🔴🔴 Risky error detected! Retrying after ${Math.round(
         longDelay / 1000 / 60
-      )} minutes...`
+      )} minutes... 🔴🔴🔴`
     );
     await randomDelay(longDelay, longDelay + 1000);
     return await continuouslyGetEarliestDate({

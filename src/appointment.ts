@@ -165,7 +165,7 @@ export async function bookEarlierAppointment({
     }
   } catch (error) {
     consoleLog("bookEarlierDate error:", error);
-    consoleLog("Dangerous error occured. Retrying after longDelay.");
+    consoleLog("🔴🔴🔴 Risky error occured. Retrying after longDelay. 🔴🔴🔴");
     await randomDelay(longDelay, longDelay + 10000);
     await bookEarlierAppointment({ currentDate, maxDate, minDate });
     return;
