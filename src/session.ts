@@ -5,6 +5,7 @@ import {
   signInUrl,
   longDelay,
   facilityId,
+  shortDelay,
 } from "@/constants";
 import { randomDelay, randomDelayAfterError } from "@/delay";
 import { consoleLog } from "@/utils";
@@ -45,9 +46,21 @@ export async function getSession({
     );
     await randomDelay(...navigationDelays);
 
-    const csrfToken = await page.$eval('meta[name="csrf-token"]', (element) =>
-      element.getAttribute("content")
-    );
+    let csrfToken: string | null = null;
+
+    try {
+      csrfToken = await page.$eval('meta[name="csrf-token"]', (element) =>
+        element.getAttribute("content")
+      );
+    } catch (error) {
+      consoleLog(
+        "Error while extracting CSRF token. Retrying with reload after short delay. Error is:",
+        error
+      );
+      await randomDelay(shortDelay, shortDelay + 1000);
+      return await getSession({ page, reload: true });
+    }
+
     if (!csrfToken) {
       consoleLog("CSRF token is not found. Retrying after delay...");
       await randomDelayAfterError();
