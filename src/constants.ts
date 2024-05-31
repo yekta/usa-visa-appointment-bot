@@ -83,6 +83,7 @@ export const sharedHeaders: Record<string, string> = {
 export const minioEndpoint = process.env.MINIO_ENDPOINT || "";
 export const minioAccessKey = process.env.MINIO_ACCESS_KEY || "";
 export const minioSecretKey = process.env.MINIO_SECRET_KEY || "";
+export const minioRegion = process.env.MINIO_REGION || "us-east-1";
 export const minioBucketName = "usa-visa-appointment-bot-logs";
 export const minio =
   minioEndpoint && minioAccessKey && minioSecretKey

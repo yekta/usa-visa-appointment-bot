@@ -9,3 +9,7 @@ export async function randomDelay(
 export async function randomDelayAfterError() {
   return randomDelay(30000, 31000);
 }
+
+export async function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

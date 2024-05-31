@@ -4,10 +4,11 @@ import util from "util";
 import moment from "moment-timezone";
 
 const logsFolder = "logs";
-export const fileName = formatDate(processStartDate, {
+
+export const fileName = `${formatDate(processStartDate, {
   fileNameSafe: true,
-});
-export const filePath = `${logsFolder}/${fileName}.txt`;
+})}.txt`;
+export const filePath = `${logsFolder}/${fileName}`;
 
 export function consoleLog(...args: any[]): void {
   const currentDate = formatDate(new Date());
