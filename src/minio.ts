@@ -1,25 +1,41 @@
 import { minio, minioBucketName } from "@/constants";
 import { randomDelay } from "@/delay";
-import { fileName, filePath } from "@/utils";
+import { consoleLog, fileName, filePath } from "@/utils";
+import fs from "fs/promises";
+
+const region = "us-east-1";
 
 export async function continuouslySaveLogsToMinio() {
-  if (!minio) return null;
+  if (!minio) {
+    consoleLog("🟪🟡 MinIO is not enabled, not saving logs.");
+    return;
+  }
   try {
-    const exists = await minio.bucketExists(minioBucketName);
-    if (exists) {
-      console.log("Bucket " + minioBucketName + " exists.");
-    } else {
-      await minio.makeBucket(minioBucketName, "us-east-1");
-      console.log("Bucket " + minioBucketName + ' created in "us-east-1".');
+    const fileExists = await doesFileExist(filePath);
+    if (fileExists) {
+      const exists = await minio.bucketExists(minioBucketName);
+      if (!exists) {
+        await minio.makeBucket(minioBucketName, region);
+        consoleLog(`🟪🟢 Bucket created in "${region}":`, minioBucketName);
+      }
+      const metaData = {
+        "Content-Type": "text/plain",
+      };
+      await minio.fPutObject(minioBucketName, fileName, filePath, metaData);
+      consoleLog("🟪🟢 Logs saved to MinIO successfully:", fileName);
     }
-    const metaData = {
-      "Content-Type": "text/plain",
-    };
-    await minio.fPutObject(minioBucketName, fileName, filePath, metaData);
-    console.log("🟪 Logs saved to Minio successfully:", fileName);
     await randomDelay(1000 * 60, 1000 * 61);
     return await continuouslySaveLogsToMinio();
   } catch (error) {
-    console.error("Error while creating the bucket:", error);
+    consoleLog("🟪🔴 Error while creating the bucket:", error);
+  }
+}
+
+async function doesFileExist(filePath: string) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch (error) {
+    return false;
   }
 }

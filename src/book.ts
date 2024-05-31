@@ -65,6 +65,6 @@ export async function book(props: TRescheduleProps): Promise<string | null> {
   }
 
   const resText = await res.text();
-  consoleLog("🎉🎉🎉 Booked appointment:", resText);
+  consoleLog("🤨 Booking process is complete:", resText);
   return resText;
 }
