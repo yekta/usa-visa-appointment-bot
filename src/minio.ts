@@ -27,7 +27,7 @@ export async function continuouslySaveLogsToMinio() {
     await delay(logInterval);
     return await continuouslySaveLogsToMinio();
   } catch (error) {
-    consoleLog("🟪🔴 Error while creating the bucket:", error);
+    consoleLog("🟪🔴 MinIO error:", error);
   }
 }
 
