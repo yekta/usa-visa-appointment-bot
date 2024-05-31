@@ -22,7 +22,7 @@ export async function continuouslySaveLogsToMinio() {
         "Content-Type": "text/plain",
       };
       await minio.fPutObject(minioBucketName, fileName, filePath, metaData);
-      consoleLog("🟪🟢 Logs saved to MinIO :", fileName);
+      consoleLog("🟪🟢 Logs saved to MinIO:", fileName);
     }
   } catch (error) {
     consoleLog("🟪🔴 MinIO error:", error);
