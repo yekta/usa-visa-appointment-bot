@@ -1,17 +1,14 @@
 import {
-  email,
-  password,
   appointmentUrl,
-  signInUrl,
+  email,
   longDelay,
-  facilityId,
+  password,
   shortDelay,
+  signInUrl,
 } from "@/constants";
 import { randomDelay, randomDelayAfterError } from "@/delay";
 import { consoleLog } from "@/utils";
 import { Page } from "puppeteer";
-import fs from "fs";
-import { sendDiscordNotification } from "@/discord";
 
 const navigationDelays = [15000, 16000];
 

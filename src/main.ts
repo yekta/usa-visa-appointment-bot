@@ -5,9 +5,11 @@ import {
   currentAppointmentDate,
   maxAppointmentDate,
   minAppointmentDate,
+  minio,
 } from "@/constants";
 import express from "express";
 import { consoleLog } from "@/utils";
+import { continuouslySaveLogsToMinio } from "@/minio";
 const app = express();
 
 app.get("/", (req, res) => {
@@ -24,3 +26,7 @@ bookEarlierAppointment({
   maxDate: maxAppointmentDate,
   minDate: minAppointmentDate,
 });
+
+if (minio) {
+  continuouslySaveLogsToMinio();
+}

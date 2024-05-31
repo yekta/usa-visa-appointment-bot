@@ -1,4 +1,5 @@
 import moment from "moment-timezone";
+import * as Minio from "minio";
 
 export const botVersion = "1.0.4";
 
@@ -78,3 +79,17 @@ export const sharedHeaders: Record<string, string> = {
   "User-Agent": userAgent,
   "If-None-Match": `W/"96a198de0e7fb3a48efd7a39c86d7f8c"`,
 };
+
+export const minioEndpoint = process.env.MINIO_ENDPOINT || "";
+export const minioAccessKey = process.env.MINIO_ACCESS_KEY || "";
+export const minioSecretKey = process.env.MINIO_SECRET_KEY || "";
+export const minioBucketName = "usa-visa-appointment-bot-logs";
+export const minio =
+  minioEndpoint && minioAccessKey && minioSecretKey
+    ? new Minio.Client({
+        endPoint: minioEndpoint,
+        accessKey: minioAccessKey,
+        secretKey: minioSecretKey,
+        useSSL: true,
+      })
+    : null;
