@@ -3,7 +3,7 @@ import { delay } from "@/delay";
 import { consoleLog, fileName, filePath } from "@/utils";
 import fs from "fs/promises";
 
-const logInterval = 1000 * 60;
+const logInterval = 1000 * 60 * 2;
 
 export async function continuouslySaveLogsToMinio() {
   if (!minio) {
@@ -22,7 +22,7 @@ export async function continuouslySaveLogsToMinio() {
         "Content-Type": "text/plain",
       };
       await minio.fPutObject(minioBucketName, fileName, filePath, metaData);
-      consoleLog("🟪🟢 Logs saved to MinIO successfully. File name:", fileName);
+      consoleLog("🟪🟢 Logs saved to MinIO :", fileName);
     }
     await delay(logInterval);
     return await continuouslySaveLogsToMinio();
