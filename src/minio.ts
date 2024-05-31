@@ -24,10 +24,11 @@ export async function continuouslySaveLogsToMinio() {
       await minio.fPutObject(minioBucketName, fileName, filePath, metaData);
       consoleLog("🟪🟢 Logs saved to MinIO :", fileName);
     }
-    await delay(logInterval);
-    return await continuouslySaveLogsToMinio();
   } catch (error) {
     consoleLog("🟪🔴 MinIO error:", error);
+  } finally {
+    await delay(logInterval);
+    return await continuouslySaveLogsToMinio();
   }
 }
 
