@@ -45,10 +45,26 @@ export const password = process.env.PASSWORD || "";
 export const scheduleId = process.env.SCHEDULE_ID || "";
 export const facilityId = process.env.FACILITY_ID || "";
 export const countryCode = process.env.COUNTRY_CODE || "";
+export const delayRangeMs = (process.env.DELAY_RANGE_MS || "15000,16000")
+  .split(",")
+  .map((i) => i.replaceAll(" ", ""))
+  .map((i) => parseInt(i));
+export const delayRangeAfterErrorMs = (
+  process.env.DELAY_RANGE_AFTER_ERROR_MS || "60000,61000"
+)
+  .split(",")
+  .map((i) => i.replaceAll(" ", ""))
+  .map((i) => parseInt(i));
 
 if (!email || !password || !scheduleId || !facilityId || !countryCode) {
   throw new Error(
     "Please provide all the required environment variables: EMAIL, PASSWORD, SCHEDULE_ID, FACILITY_ID, COUNTRY_CODE"
+  );
+}
+
+if (delayRangeAfterErrorMs.length !== 2 || delayRangeMs.length !== 2) {
+  throw new Error(
+    "Please provide DELAY_RANGE_MS and DELAY_RANGE_AFTER_ERROR_MS as two comma-separated numbers"
   );
 }
 

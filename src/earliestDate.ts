@@ -8,6 +8,7 @@ import {
   sharedHeaders,
   timeLocale,
   timeZone,
+  delayRangeMs,
 } from "@/constants";
 import { randomDelay, randomDelayAfterError } from "@/delay";
 import { sendDiscordNotification } from "@/discord";
@@ -15,8 +16,6 @@ import { getSession } from "@/session";
 import { consoleLog } from "@/utils";
 import moment from "moment-timezone";
 import { Page } from "puppeteer";
-
-const earliestDatePullDelays = [8000, 9000];
 
 export async function continuouslyGetEarliestDate({
   page,
@@ -97,7 +96,7 @@ export async function continuouslyGetEarliestDate({
 
     if (resJson.length === 0) {
       consoleLog("No available dates found. Checking again after delay...");
-      await randomDelay(...earliestDatePullDelays);
+      await randomDelay(...delayRangeMs);
       return await continuouslyGetEarliestDate({
         page,
         cookiesString,
@@ -145,7 +144,7 @@ export async function continuouslyGetEarliestDate({
         });
       }
       consoleLog("Checking the availability after delay...");
-      await randomDelay(...earliestDatePullDelays);
+      await randomDelay(...delayRangeMs);
       return await continuouslyGetEarliestDate({
         page,
         cookiesString,

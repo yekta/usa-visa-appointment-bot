@@ -3,7 +3,6 @@ import {
   getAppointmentTimesUrl,
   visaHost,
   sharedHeaders,
-  userAgent,
 } from "@/constants";
 import { randomDelay, randomDelayAfterError } from "@/delay";
 import { getSession } from "@/session";
