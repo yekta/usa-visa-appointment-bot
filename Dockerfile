@@ -10,6 +10,8 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json (if available)
 COPY package*.json ./
 
+ENV IS_PROD=true
+
 # Tell Puppeteer not to download Chromium because we’re installing our own
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
