@@ -14,22 +14,7 @@ COPY package*.json ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Install dependencies and install the appropriate browser based on architecture
-RUN apt-get update && \
-  apt-get install -y gnupg wget && \
-  if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-  echo "Installing Google Chrome Stable for amd64" && \
-  wget --quiet --output-document=- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /etc/apt/trusted.gpg.d/google-archive.gpg && \
-  echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list && \
-  apt-get update && \
-  apt-get install -y google-chrome-stable --no-install-recommends; \
-  else \
-  echo "Installing Chromium for non-amd64 (e.g. arm)" && \
-  apt-get update && \
-  apt-get install -y chromium --no-install-recommends && \
-  # Create a symlink so that Puppeteer finds the browser at /usr/bin/google-chrome-stable
-  ln -s /usr/bin/chromium /usr/bin/google-chrome-stable; \
-  fi && \
-  rm -rf /var/lib/apt/lists/*
+RUN apt install chromium
 
 # Install typescript (if needed by your project)
 RUN npm install typescript
