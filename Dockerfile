@@ -13,8 +13,17 @@ COPY package*.json ./
 # Tell Puppeteer not to download Chromium because we’re installing our own
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Install dependencies and install the appropriate browser based on architecture
-RUN apt install chromium
+# Install Chromium for both ARM and x86
+RUN apt-get update && \
+  apt-get install -y chromium \
+  # Only minimal dependencies needed
+  ca-certificates \
+  fonts-liberation \
+  libasound2 && \
+  rm -rf /var/lib/apt/lists/*
+
+# Tell Puppeteer to use the installed Chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Install typescript (if needed by your project)
 RUN npm install typescript
